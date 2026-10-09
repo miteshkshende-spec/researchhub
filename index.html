@@ -13,7 +13,6 @@
 </head>
 <body>
 
- 
 <div id="authSection" style="max-width:400px;margin:30px auto;padding:20px;border:1px solid #ddd;border-radius:12px">
   <h2>ResearchHub Login</h2>
   <form id="loginForm">
@@ -171,14 +170,39 @@ $('loginForm').addEventListener('submit', async (e) => {
   $('authMessage').textContent = 'Signing in...';
 
   const { error } = await supabaseClient.auth.signInWithPassword({
+ //   email,
+   // password
+  //});
+
+//   $('authMessage').textContent = error
+//     ? error.message
+//     : 'Signed in successfully!';
+// });
+ 
+const $=id=>document.getElementById(id);
+
+$('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const email = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+  $('authMessage').textContent = 'Signing in...';
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
     email,
     password
   });
 
-  $('authMessage').textContent = error
-    ? error.message
-    : 'Signed in successfully!';
+  if (error) {
+    $('authMessage').textContent = error.message;
+    return;
+  }
+
+  $('authMessage').textContent = 'Signed in successfully!';
+  $('authSection').style.display = 'none';
+  $('appDashboard').style.display = '';
 });
+  
 
 $('signupButton').addEventListener('click', async () => {
   const email = $('authEmail').value.trim();
