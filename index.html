@@ -30,7 +30,8 @@
 </div>
 
  
-<div class="layout">
+
+<div class="layout" id="appDashboard" style="display:none;">
 <aside class="sidebar">
  <div class="brand"><span class="logo">R</span> ResearchHub</div>
  <nav class="nav">
@@ -161,7 +162,7 @@ const supabaseClient = window.supabase.createClient(
 );
  
 const $=id=>document.getElementById(id);
-  
+//  
 $('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
