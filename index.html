@@ -276,6 +276,29 @@ function go(v){document.querySelectorAll('.view').forEach(e=>e.classList.toggle(
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.view)));document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.goto)));
 function csv(k){const rows=state[k];if(!rows.length){alert('No records to export yet.');return}const cols=[...new Set(rows.flatMap(r=>Object.keys(r).filter(x=>x!=='id')))];const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const out=[cols.map(q).join(','),...rows.map(r=>cols.map(c=>q(r[c])).join(','))].join('\r\n');const blob=new Blob(['\ufeff'+out],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`researchhub-${k}.csv`;a.click();URL.revokeObjectURL(url)}
 $('exportPapers').onclick=()=>csv('papers');$('exportDocs').onclick=()=>csv('docs');$('exportData').onclick=()=>csv('data');
-renderAll();
+$('forgotPasswordButton').addEventListener('click', async () => {
+  const email = $('authEmail').value.trim();
+
+  if (!email) {
+    $('authMessage').textContent = 'Enter your email first.';
+    return;
+  }
+
+  $('authMessage').textContent = 'Sending recovery email...';
+
+  try {
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://miteshkshende-spec.github.io/researchhub/'
+    });
+
+    $('authMessage').textContent = error
+      ? error.message
+      : 'Recovery email sent! Check your inbox and spam folder.';
+  } catch (err) {
+    $('authMessage').textContent = 'Could not send recovery email. Please try again.';
+    console.error(err);
+  }
+});
+   renderAll();
 </script>
 </body></html>
