@@ -194,9 +194,9 @@ $('signupButton').addEventListener('click', async () => {
   const email = $('authEmail').value.trim();
   const password = $('authPassword').value;
 
-  if (!email || password.length < 6) {
+  if (!email || password.length < 13) {
     $('authMessage').textContent =
-      'Enter your email and a password of at least 6 characters.';
+      'Enter your email and a password of at least 13 characters.';
     return;
   }
 
