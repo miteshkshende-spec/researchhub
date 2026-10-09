@@ -12,6 +12,24 @@
 </style>
 </head>
 <body>
+
+ 
+<div id="authSection" style="max-width:400px;margin:30px auto;padding:20px;border:1px solid #ddd;border-radius:12px">
+  <h2>ResearchHub Login</h2>
+  <form id="loginForm">
+    <label>Email</label>
+    <input id="authEmail" type="email" required
+      style="display:block;width:100%;padding:10px;margin:8px 0 16px">
+    <label>Password</label>
+    <input id="authPassword" type="password" required minlength="6"
+      style="display:block;width:100%;padding:10px;margin:8px 0 16px">
+    <button type="submit">Sign in</button>
+    <button type="button" id="signupButton">Create account</button>
+  </form>
+  <p id="authMessage"></p>
+</div>
+
+ 
 <div class="layout">
 <aside class="sidebar">
  <div class="brand"><span class="logo">R</span> ResearchHub</div>
