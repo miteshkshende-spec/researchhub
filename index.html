@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#173f72">
+<title>ResearchHub — Research workspace</title>
+<style>
+:root{--navy:#173f72;--blue:#2868bd;--pale:#eaf2ff;--ink:#17243a;--muted:#65748b;--bg:#f4f7fb;--line:#e1e8f1;--card:#fff;--green:#157953;--orange:#9a5b08}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.layout{min-height:100vh;display:grid;grid-template-columns:245px 1fr}.sidebar{background:#fff;border-right:1px solid var(--line);padding:24px 15px;display:flex;flex-direction:column;gap:24px}.brand{display:flex;align-items:center;gap:10px;padding:0 8px;font-size:20px;font-weight:850;letter-spacing:-.5px}.logo{height:37px;width:37px;background:var(--navy);color:#fff;border-radius:12px;display:grid;place-items:center}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;text-align:left;padding:12px;border-radius:11px;color:var(--muted);font-weight:700}.nav button.active,.nav button:hover{background:var(--pale);color:var(--navy)}.sidefoot{margin-top:auto;border:1px solid var(--line);background:#f8faff;padding:13px;border-radius:13px;color:var(--muted);font-size:12px;line-height:1.6}main{min-width:0;width:100%;max-width:1500px;margin:auto;padding:27px clamp(16px,3vw,42px) 45px}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px}.eyebrow{text-transform:uppercase;letter-spacing:1.4px;font-size:11px;color:var(--blue);font-weight:850}.top h1{font-size:clamp(25px,3vw,34px);margin:4px 0 0;letter-spacing:-1px}.pill{background:var(--pale);color:var(--navy);padding:8px 11px;border-radius:99px;font-size:12px;font-weight:800}.hero{background:linear-gradient(120deg,#173f72,#367cc7);color:#fff;border-radius:21px;padding:27px;display:flex;justify-content:space-between;align-items:center;gap:15px}.hero h2{font-size:clamp(23px,3vw,31px);margin:0 0 8px}.hero p{margin:0;max-width:620px;color:#e4efff;line-height:1.6}.hero .art{font-size:56px}.btn{border:0;border-radius:10px;background:var(--navy);color:#fff;padding:10px 14px;font-weight:750}.btn.white{background:#fff;color:var(--navy);margin-top:17px}.btn.soft{background:var(--pale);color:var(--navy)}.btn.line{background:#fff;color:var(--navy);border:1px solid #cbd8e8}.btn.danger{background:#fff0f1;color:#a22d3b}.btn.small{font-size:12px;padding:7px 10px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-top:17px}.stat,.panel,.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:17px}.stat .label{font-size:12px;color:var(--muted);font-weight:750}.stat strong{display:block;font-size:28px;margin:9px 0 3px;letter-spacing:-1px}.stat small{color:var(--muted)}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:25px 0 13px}.sectionhead h2{font-size:19px;margin:0}.muted{color:var(--muted)}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.feature{background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px}.feature .ico{width:42px;height:42px;display:grid;place-items:center;background:var(--pale);border-radius:12px;font-size:22px}.feature h3{margin:12px 0 6px;font-size:16px}.feature p{font-size:13px;line-height:1.55;color:var(--muted);min-height:40px;margin:0 0 12px}.view{display:none}.view.active{display:block}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:grid;gap:6px;margin-bottom:11px}.field.full{grid-column:1/-1}.field label{font-size:12px;color:var(--muted);font-weight:800}.field input,.field textarea,.field select,.search{width:100%;border:1px solid #d6e0ed;border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);outline:none}.field textarea{min-height:95px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus,.search:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2868bd19}.split{display:grid;grid-template-columns:minmax(280px,.8fr) minmax(0,1.2fr);gap:15px}.list{display:grid;gap:10px}.record{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px;overflow-wrap:anywhere}.record h3{font-size:15px;margin:0 0 6px}.record p{font-size:13px;color:var(--muted);line-height:1.5;white-space:pre-wrap;margin:5px 0}.meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:9px}.tag{display:inline-block;background:#f0f4fa;border-radius:6px;padding:4px 7px;font-size:11px;color:#4c5e76;margin:2px}.empty{border:1px dashed #c8d4e4;border-radius:13px;text-align:center;padding:25px;color:var(--muted);font-size:13px}.tablewrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:13px}table{border-collapse:collapse;width:100%;font-size:13px;min-width:650px}th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#f8faff;color:#50617a;font-size:11px;text-transform:uppercase;letter-spacing:.5px}td input{min-width:80px;width:100%;border:1px solid #e0e6ef;border-radius:6px;padding:7px}footer{padding:25px 0 0;text-align:center;color:var(--muted);font-size:11px;line-height:1.6}.mobile-nav{display:none}.warning{background:#fff8e9;color:#76500d;border:1px solid #f2dfb1;border-radius:12px;padding:12px 14px;font-size:12px;line-height:1.6;margin:14px 0}.success{color:var(--green);font-size:12px;font-weight:700}.status{font-size:11px;font-weight:800;padding:4px 7px;border-radius:6px;background:#e9f8f0;color:#16754f}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.sidebar{display:none}main{padding:18px 15px 88px}.mobile-nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 5px max(7px,env(safe-area-inset-bottom));gap:3px}.mobile-nav button{border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:750;border-radius:9px;padding:8px 2px}.mobile-nav button.active{background:var(--pale);color:var(--navy)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}.split{grid-template-columns:1fr}}
+@media(max-width:560px){.hero{padding:21px}.hero .art{display:none}.grid3{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.stat{padding:13px}.stat strong{font-size:24px}.sectionhead{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+ <div class="brand"><span class="logo">R</span> ResearchHub</div>
+ <nav class="nav">
+  <button class="active" data-view="home">⌂ &nbsp; Overview</button>
+  <button data-view="projects">▣ &nbsp; Projects</button>
+  <button data-view="papers">▤ &nbsp; Paper library</button>
+  <button data-view="documents">▧ &nbsp; Documents</button>
+  <button data-view="data">▦ &nbsp; Research data</button>
+  <button data-view="tasks">✓ &nbsp; Tasks & deadlines</button>
+ </nav>
+ <div class="sidefoot"><b>Research with clarity.</b><br>Organize your sources, methods, data, and project paperwork in one workspace.<br><br>Starter version · Local browser storage</div>
+</aside>
+<main>
+<header class="top"><div><div class="eyebrow">Your research workspace</div><h1 id="pageTitle">Research overview</h1></div><span class="pill">FREE STARTER</span></header>
+<section class="view active" id="home">
+ <div class="hero"><div><h2>Your research, organized.</h2><p>Track projects, collect literature, keep document records, enter observations, and stay on top of research tasks.</p><button class="btn white" data-goto="projects">Create a project →</button></div><div class="art">🔬</div></div>
+ <div class="stats">
+  <div class="stat"><div class="label">Research projects</div><strong id="sProjects">0</strong><small>Projects tracked</small></div>
+  <div class="stat"><div class="label">Papers collected</div><strong id="sPapers">0</strong><small>Literature library</small></div>
+  <div class="stat"><div class="label">Document records</div><strong id="sDocs">0</strong><small>Files and paperwork</small></div>
+  <div class="stat"><div class="label">Data entries</div><strong id="sData">0</strong><small>Observations recorded</small></div>
+ </div>
+ <div class="sectionhead"><h2>Research toolkit</h2><span class="muted">Choose a workspace</span></div>
+ <div class="grid3">
+  <article class="feature"><div class="ico">🧪</div><h3>Projects & methods</h3><p>Record research aims, research questions, method, status, and milestones.</p><button class="btn soft small" data-goto="projects">Open projects →</button></article>
+  <article class="feature"><div class="ico">📚</div><h3>Literature review</h3><p>Capture authors, DOI, abstract, method, findings, limitations, and research gaps.</p><button class="btn soft small" data-goto="papers">Open paper library →</button></article>
+  <article class="feature"><div class="ico">🗂️</div><h3>Paperwork</h3><p>Keep a searchable register of proposals, reports, questionnaires, and file links.</p><button class="btn soft small" data-goto="documents">Open documents →</button></article>
+  <article class="feature"><div class="ico">📊</div><h3>Data collection</h3><p>Log observations, experiment readings, survey records, dates, and units.</p><button class="btn soft small" data-goto="data">Enter research data →</button></article>
+  <article class="feature"><div class="ico">📅</div><h3>Tasks & deadlines</h3><p>Track literature review tasks, data collection, draft submission, and due dates.</p><button class="btn soft small" data-goto="tasks">View tasks →</button></article>
+  <article class="feature"><div class="ico">🤝</div><h3>Guide & team workflow</h3><p>Prepare for collaboration. Shared logins and cloud syncing are future features.</p><span class="tag">Planned upgrade</span></article>
+ </div>
+ <div class="warning"><b>Important for research safety:</b> this starter stores records in the current browser on this device. It does not upload files to a server, sync between devices, or provide user accounts. Do not store sensitive participant data here. Export regular backups.</div>
+ <footer>ResearchHub · Starter prototype · No paid API required</footer>
+</section>
+
+<section class="view" id="projects">
+ <div class="sectionhead"><h2>Research projects</h2><span class="muted">Aim · questions · methods · status</span></div>
+ <div class="split">
+  <div class="panel"><h3 style="margin-top:0">Add a project</h3><form id="projectForm" class="formgrid">
+   <div class="field full"><label>Project title *</label><input id="pTitle" required maxlength="150" placeholder="e.g. Metal oxide coupling study"></div>
+   <div class="field"><label>Research type</label><select id="pType"><option>Engineering</option><option>Scientific</option><option>Social science</option><option>Medical / health</option><option>Education</option><option>Other</option></select></div>
+   <div class="field"><label>Status</label><select id="pStatus"><option>Planning</option><option>Literature review</option><option>Data collection</option><option>Analysis</option><option>Writing</option><option>Completed</option></select></div>
+   <div class="field full"><label>Research aim / question</label><textarea id="pAim" placeholder="What do you want to investigate?"></textarea></div>
+   <div class="field full"><label>Methodology</label><textarea id="pMethod" placeholder="Experimental, survey, qualitative, quantitative, mixed methods..."></textarea></div>
+   <div class="field"><label>Start date</label><input id="pStart" type="date"></div><div class="field"><label>Target deadline</label><input id="pDue" type="date"></div>
+   <div class="field full"><button class="btn">Save project</button></div>
+  </form></div>
+  <div><div class="field"><label>Search projects</label><input class="search" id="projectSearch" placeholder="Search title, aim, method..."></div><div id="projectList" class="list"></div></div>
+ </div>
+</section>
+
+<section class="view" id="papers">
+ <div class="sectionhead"><h2>Paper library & literature review</h2><button class="btn line small" id="exportPapers">Export paper list CSV</button></div>
+ <div class="split">
+  <div class="panel"><h3 style="margin-top:0">Add a research paper</h3><form id="paperForm" class="formgrid">
+   <div class="field full"><label>Paper title *</label><input id="paperTitle" required maxlength="250" placeholder="Full paper title"></div>
+   <div class="field full"><label>Authors</label><input id="paperAuthors" placeholder="Surname, initials; separate authors with semicolons"></div>
+   <div class="field"><label>Publication year</label><input id="paperYear" type="number" min="1800" max="2200" placeholder="2026"></div><div class="field"><label>Journal / source</label><input id="paperJournal" placeholder="Journal or conference"></div>
+   <div class="field full"><label>DOI or URL</label><input id="paperDoi" type="url" placeholder="https://doi.org/... or article URL"></div>
+   <div class="field full"><label>Keywords</label><input id="paperKeywords" placeholder="materials, methodology, sensor..."></div>
+   <div class="field full"><label>Abstract / summary</label><textarea id="paperAbstract" placeholder="What question does this paper address?"></textarea></div>
+   <div class="field full"><label>Methodology used</label><textarea id="paperMethod" placeholder="Design, sample, instruments, analysis..."></textarea></div>
+   <div class="field full"><label>Main findings, limitations, and research gap</label><textarea id="paperFindings" placeholder="Findings: ...&#10;Limitations: ...&#10;Research gap: ..."></textarea></div>
+   <div class="field full"><label>PDF file (optional; filename/link record only)</label><input id="paperFile" type="file" accept=".pdf,.doc,.docx"></div>
+   <div class="field full"><button class="btn">Save paper record</button></div>
+  </form><p class="muted" style="font-size:11px">This prototype records the selected filename only. It does not upload or store the actual PDF file.</p></div>
+  <div><div class="field"><label>Search papers</label><input class="search" id="paperSearch" placeholder="Search title, author, keyword, method..."></div><div id="paperList" class="list"></div></div>
+ </div>
+</section>
+
+<section class="view" id="documents">
+ <div class="sectionhead"><h2>Documents & paperwork</h2><button class="btn line small" id="exportDocs">Export register CSV</button></div>
+ <div class="split">
+  <div class="panel"><h3 style="margin-top:0">Register a document</h3><form id="docForm">
+   <div class="field"><label>Document title *</label><input id="dTitle" required maxlength="180" placeholder="e.g. Research proposal v1"></div>
+   <div class="formgrid"><div class="field"><label>Document type</label><select id="dType"><option>Research proposal</option><option>Literature review</option><option>Methodology draft</option><option>Questionnaire / survey</option><option>Consent form</option><option>Experiment protocol</option><option>Progress report</option><option>Final report / thesis</option><option>Ethics approval</option><option>Other</option></select></div><div class="field"><label>Related project</label><input id="dProject" placeholder="Project title"></div></div>
+   <div class="field"><label>File on your device (filename only)</label><input id="dFile" type="file" accept=".pdf,.doc,.docx,.xlsx,.csv,.txt,.ppt,.pptx,.jpg,.png"></div>
+   <div class="field"><label>Local path, cloud link, or notes</label><textarea id="dNotes" placeholder="Add a link to your own storage or note where the file is saved."></textarea></div>
+   <button class="btn">Save document record</button>
+  </form><p class="muted" style="font-size:11px">For actual files, keep your originals in a folder or cloud drive you control and paste a share link if appropriate.</p></div>
+  <div><div class="field"><label>Search documents</label><input class="search" id="docSearch" placeholder="Search title, type, project..."></div><div id="docList" class="list"></div></div>
+ </div>
+</section>
+
+<section class="view" id="data">
+ <div class="sectionhead"><h2>Research data collection</h2><button class="btn line small" id="exportData">Export data CSV</button></div>
+ <div class="warning">Use anonymous IDs rather than names or contact details for human participants. Follow your institution's ethics and consent rules. This is a local prototype, not a validated research data repository.</div>
+ <div class="split">
+  <div class="panel"><h3 style="margin-top:0">Add a data record</h3><form id="dataForm">
+   <div class="field"><label>Record name / observation ID *</label><input id="xName" required placeholder="e.g. Sample S-001"></div>
+   <div class="formgrid"><div class="field"><label>Project</label><input id="xProject" placeholder="Project title"></div><div class="field"><label>Date collected</label><input id="xDate" type="date"></div>
+   <div class="field"><label>Variable / measurement</label><input id="xVariable" placeholder="e.g. Temperature"></div><div class="field"><label>Value</label><input id="xValue" placeholder="e.g. 28.5"></div>
+   <div class="field"><label>Unit</label><input id="xUnit" placeholder="e.g. °C, V, mg"></div><div class="field"><label>Collection method</label><input id="xMethod" placeholder="Sensor, survey, observation..."></div></div>
+   <div class="field"><label>Notes / conditions</label><textarea id="xNotes" placeholder="Instrument, conditions, anomalies, context..."></textarea></div>
+   <button class="btn">Save data record</button>
+  </form></div>
+  <div><div class="field"><label>Search data records</label><input class="search" id="dataSearch" placeholder="Search ID, variable, project..."></div><div id="dataList" class="list"></div></div>
+ </div>
+</section>
+
+<section class="view" id="tasks">
+ <div class="sectionhead"><h2>Tasks & deadlines</h2><span class="muted">Plan your next steps</span></div>
+ <div class="split">
+  <div class="panel"><h3 style="margin-top:0">Add a task</h3><form id="taskForm">
+   <div class="field"><label>Task *</label><input id="tTitle" required maxlength="180" placeholder="e.g. Finish literature review matrix"></div>
+   <div class="formgrid"><div class="field"><label>Related project</label><input id="tProject" placeholder="Project title"></div><div class="field"><label>Due date</label><input id="tDue" type="date"></div>
+   <div class="field"><label>Priority</label><select id="tPriority"><option>Normal</option><option>High</option><option>Low</option></select></div><div class="field"><label>Assigned to (planning only)</label><input id="tAssignee" placeholder="You / guide / team"></div></div>
+   <button class="btn">Add task</button>
+  </form><p class="muted" style="font-size:11px">Assignments are labels only; they do not send invitations or share data.</p></div>
+  <div><div class="field"><label>Filter tasks</label><select class="search" id="taskFilter"><option>All tasks</option><option>Open tasks</option><option>Completed tasks</option></select></div><div id="taskList" class="list"></div></div>
+ </div>
+</section>
+<footer>ResearchHub starter · Export your records regularly · Actual cloud storage, accounts, and team collaboration require a secure backend.</footer>
+</main>
+</div>
+<nav class="mobile-nav">
+ <button class="active" data-view="home">⌂<br>Overview</button><button data-view="projects">▣<br>Projects</button><button data-view="papers">▤<br>Papers</button><button data-view="data">▦<br>Data</button>
+</nav>
+<script>
+const $=id=>document.getElementById(id);
+const keys={projects:'rh_projects',papers:'rh_papers',docs:'rh_docs',data:'rh_data',tasks:'rh_tasks'};
+const read=k=>{try{return JSON.parse(localStorage.getItem(keys[k]))||[]}catch{return []}};
+const state={projects:read('projects'),papers:read('papers'),docs:read('docs'),data:read('data'),tasks:read('tasks')};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const today=()=>new Date().toLocaleDateString();
+function save(k){localStorage.setItem(keys[k],JSON.stringify(state[k]));renderAll()}
+function del(k,itemId){if(confirm('Delete this record?')){state[k]=state[k].filter(x=>x.id!==itemId);save(k)}}
+function card(title,details,meta,k,itemId,extra=''){return `<article class="record"><h3>${esc(title)}</h3>${details?`<p>${esc(details)}</p>`:''}${extra}<div class="meta"><span>${esc(meta||'')}</span><button class="btn danger small" data-del="${k}:${itemId}">Delete</button></div></article>`}
+function bindDeletes(){document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.del.split(':');del(k,i)})}
+function renderProjects(){const q=$('projectSearch').value.toLowerCase();const rows=state.projects.filter(x=>(x.title+x.aim+x.method+x.type+x.status).toLowerCase().includes(q));$('projectList').innerHTML=rows.length?rows.map(x=>card(x.title,`Aim: ${x.aim||'—'}\nMethod: ${x.method||'—'}`,`${x.type} · ${x.status}${x.due?' · Due '+x.due:''}`,'projects',x.id,`<span class="tag">${esc(x.status)}</span>`)).join(''):'<div class="empty">No matching projects yet. Add your first research project.</div>';bindDeletes()}
+function renderPapers(){const q=$('paperSearch').value.toLowerCase();const rows=state.papers.filter(x=>(x.title+x.authors+x.keywords+x.abstract+x.method+x.findings+x.journal).toLowerCase().includes(q));$('paperList').innerHTML=rows.length?rows.map(x=>card(x.title,`Authors: ${x.authors||'—'}\nSummary: ${x.abstract||'—'}\nMethod: ${x.method||'—'}\nFindings / limitations / gap: ${x.findings||'—'}\n${x.doi?'DOI/URL: '+x.doi:''}`,`${x.year||'Year unknown'} · ${x.journal||'Source not entered'}${x.file?' · File noted: '+x.file:''}`,'papers',x.id,`${(x.keywords||'').split(',').filter(Boolean).map(t=>`<span class="tag">${esc(t.trim())}</span>`).join('')}`)).join(''):'<div class="empty">No papers match your search. Add a paper to start a literature review.</div>';bindDeletes()}
+function renderDocs(){const q=$('docSearch').value.toLowerCase();const rows=state.docs.filter(x=>(x.title+x.type+x.project+x.notes+x.file).toLowerCase().includes(q));$('docList').innerHTML=rows.length?rows.map(x=>card(x.title,`${x.notes||''}${x.file?'\nFilename: '+x.file:''}`,`${x.type}${x.project?' · '+x.project:''} · ${x.date}`,'docs',x.id)).join(''):'<div class="empty">No documents registered yet.</div>';bindDeletes()}
+function renderData(){const q=$('dataSearch').value.toLowerCase();const rows=state.data.filter(x=>(x.name+x.project+x.variable+x.value+x.unit+x.method+x.notes).toLowerCase().includes(q));$('dataList').innerHTML=rows.length?rows.map(x=>card(`${x.name} — ${x.variable||'Observation'}`,`Value: ${x.value||'—'} ${x.unit||''}\nMethod: ${x.method||'—'}\nNotes: ${x.notes||'—'}`,`${x.date||'Date not entered'}${x.project?' · '+x.project:''}`,'data',x.id)).join(''):'<div class="empty">No data records yet. Add an observation or measurement.</div>';bindDeletes()}
+function renderTasks(){const f=$('taskFilter').value;let rows=state.tasks.filter(x=>f==='All tasks'||(f==='Open tasks'?!x.done:x.done));rows.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));$('taskList').innerHTML=rows.length?rows.map(x=>`<article class="record"><div style="display:flex;justify-content:space-between;gap:8px;align-items:start"><h3>${esc(x.title)}</h3><span class="status">${x.done?'DONE':'OPEN'}</span></div><p>${esc(x.project||'No project')} · ${esc(x.priority)} priority${x.assignee?' · '+esc(x.assignee):''}</p><div class="meta"><span>Due: ${esc(x.due||'Not set')}</span><span><button class="btn soft small" data-toggle="${x.id}">${x.done?'Reopen':'Mark complete'}</button> <button class="btn danger small" data-del="tasks:${x.id}">Delete</button></span></div></article>`).join(''):'<div class="empty">No tasks in this view.</div>';document.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>{const t=state.tasks.find(x=>x.id===b.dataset.toggle);t.done=!t.done;save('tasks')});bindDeletes()}
+function renderAll(){renderProjects();renderPapers();renderDocs();renderData();renderTasks();$('sProjects').textContent=state.projects.length;$('sPapers').textContent=state.papers.length;$('sDocs').textContent=state.docs.length;$('sData').textContent=state.data.length}
+function addForm(formId,k,build){$(formId).addEventListener('submit',e=>{e.preventDefault();state[k].unshift({id:id(),...build()});save(k);e.target.reset()})}
+addForm('projectForm','projects',()=>({title:$('pTitle').value.trim(),type:$('pType').value,status:$('pStatus').value,aim:$('pAim').value.trim(),method:$('pMethod').value.trim(),start:$('pStart').value,due:$('pDue').value,created:today()}));
+addForm('paperForm','papers',()=>({title:$('paperTitle').value.trim(),authors:$('paperAuthors').value.trim(),year:$('paperYear').value,journal:$('paperJournal').value.trim(),doi:$('paperDoi').value.trim(),keywords:$('paperKeywords').value.trim(),abstract:$('paperAbstract').value.trim(),method:$('paperMethod').value.trim(),findings:$('paperFindings').value.trim(),file:$('paperFile').files[0]?.name||'',created:today()}));
+addForm('docForm','docs',()=>({title:$('dTitle').value.trim(),type:$('dType').value,project:$('dProject').value.trim(),file:$('dFile').files[0]?.name||'',notes:$('dNotes').value.trim(),date:today()}));
+addForm('dataForm','data',()=>({name:$('xName').value.trim(),project:$('xProject').value.trim(),date:$('xDate').value,variable:$('xVariable').value.trim(),value:$('xValue').value.trim(),unit:$('xUnit').value.trim(),method:$('xMethod').value.trim(),notes:$('xNotes').value.trim()}));
+addForm('taskForm','tasks',()=>({title:$('tTitle').value.trim(),project:$('tProject').value.trim(),due:$('tDue').value,priority:$('tPriority').value,assignee:$('tAssignee').value.trim(),done:false}));
+[['projectSearch',renderProjects],['paperSearch',renderPapers],['docSearch',renderDocs],['dataSearch',renderData],['taskFilter',renderTasks]].forEach(([id,fn])=>$(id).addEventListener('input',fn));
+const titles={home:'Research overview',projects:'Research projects',papers:'Paper library & literature review',documents:'Documents & paperwork',data:'Research data collection',tasks:'Tasks & deadlines'};
+function go(v){document.querySelectorAll('.view').forEach(e=>e.classList.toggle('active',e.id===v));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('pageTitle').textContent=titles[v]||'ResearchHub';window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.view)));document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.goto)));
+function csv(k){const rows=state[k];if(!rows.length){alert('No records to export yet.');return}const cols=[...new Set(rows.flatMap(r=>Object.keys(r).filter(x=>x!=='id')))];const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const out=[cols.map(q).join(','),...rows.map(r=>cols.map(c=>q(r[c])).join(','))].join('\r\n');const blob=new Blob(['\ufeff'+out],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`researchhub-${k}.csv`;a.click();URL.revokeObjectURL(url)}
+$('exportPapers').onclick=()=>csv('papers');$('exportDocs').onclick=()=>csv('docs');$('exportData').onclick=()=>csv('data');
+renderAll();
+</script>
+</body></html>
