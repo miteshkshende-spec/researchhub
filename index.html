@@ -159,8 +159,49 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
-
+ 
 const $=id=>document.getElementById(id);
+  
+$('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const email = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+  $('authMessage').textContent = 'Signing in...';
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  $('authMessage').textContent = error
+    ? error.message
+    : 'Signed in successfully!';
+});
+
+$('signupButton').addEventListener('click', async () => {
+  const email = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+
+  if (!email || password.length < 6) {
+    $('authMessage').textContent =
+      'Enter your email and a password of at least 6 characters.';
+    return;
+  }
+
+  $('authMessage').textContent = 'Creating account...';
+
+  const { error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+
+  $('authMessage').textContent = error
+    ? error.message
+    : 'Account request sent. Check your email if confirmation is required.';
+});
+
+  
 const keys={projects:'rh_projects',papers:'rh_papers',docs:'rh_docs',data:'rh_data',tasks:'rh_tasks'};
 const read=k=>{try{return JSON.parse(localStorage.getItem(keys[k]))||[]}catch{return []}};
 const state={projects:read('projects'),papers:read('papers'),docs:read('docs'),data:read('data'),tasks:read('tasks')};
