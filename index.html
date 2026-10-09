@@ -161,7 +161,6 @@ const supabaseClient = window.supabase.createClient(
 );
  
 const $=id=>document.getElementById(id);
-//  
 $('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -170,6 +169,53 @@ $('loginForm').addEventListener('submit', async (e) => {
   $('authMessage').textContent = 'Signing in...';
 
  
+// const $=id=>document.getElementById(id);
+
+// $('loginForm').addEventListener('submit', async (e) => {
+//   e.preventDefault();
+
+//   const email = $('authEmail').value.trim();
+//   const password = $('authPassword').value;
+//   $('authMessage').textContent = 'Signing in...';
+
+//   const { data, error } = await supabaseClient.auth.signInWithPassword({
+//     email,
+//     password
+//   });
+
+//   if (error) {
+//     $('authMessage').textContent = error.message;
+//     return;
+//   }
+
+//   $('authMessage').textContent = 'Signed in successfully!';
+//   $('authSection').style.display = 'none';
+//   $('appDashboard').style.display = '';
+// });
+  
+
+// $('signupButton').addEventListener('click', async () => {
+//   const email = $('authEmail').value.trim();
+//   const password = $('authPassword').value;
+
+//   if (!email || password.length < 6) {
+//     $('authMessage').textContent =
+//       'Enter your email and a password of at least 6 characters.';
+//     return;
+//   }
+
+//   $('authMessage').textContent = 'Creating account...';
+
+//   const { error } = await supabaseClient.auth.signUp({
+//     email,
+//     password
+//   });
+
+//   $('authMessage').textContent = error
+//     ? error.message
+//     : 'Account request sent. Check your email if confirmation is required.';
+// });
+
 const $=id=>document.getElementById(id);
 
 $('loginForm').addEventListener('submit', async (e) => {
@@ -179,21 +225,26 @@ $('loginForm').addEventListener('submit', async (e) => {
   const password = $('authPassword').value;
   $('authMessage').textContent = 'Signing in...';
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
 
-  if (error) {
-    $('authMessage').textContent = error.message;
-    return;
+    if (error) {
+      $('authMessage').textContent = error.message;
+      return;
+    }
+
+    $('authMessage').textContent = 'Signed in successfully!';
+    $('authSection').style.display = 'none';
+    $('appDashboard').style.display = '';
+  } catch (err) {
+    $('authMessage').textContent =
+      'Login failed. Please try again.';
+    console.error(err);
   }
-
-  $('authMessage').textContent = 'Signed in successfully!';
-  $('authSection').style.display = 'none';
-  $('appDashboard').style.display = '';
 });
-  
 
 $('signupButton').addEventListener('click', async () => {
   const email = $('authEmail').value.trim();
@@ -207,14 +258,20 @@ $('signupButton').addEventListener('click', async () => {
 
   $('authMessage').textContent = 'Creating account...';
 
-  const { error } = await supabaseClient.auth.signUp({
-    email,
-    password
-  });
+  try {
+    const { error } = await supabaseClient.auth.signUp({
+      email,
+      password
+    });
 
-  $('authMessage').textContent = error
-    ? error.message
-    : 'Account request sent. Check your email if confirmation is required.';
+    $('authMessage').textContent = error
+      ? error.message
+      : 'Account request sent. Check your email if confirmation is required.';
+  } catch (err) {
+    $('authMessage').textContent =
+      'Account creation failed. Please try again.';
+    console.error(err);
+  }
 });
 
   
