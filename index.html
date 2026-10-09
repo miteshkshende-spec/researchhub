@@ -132,7 +132,16 @@
  <button class="active" data-view="home">⌂<br>Overview</button><button data-view="projects">▣<br>Projects</button><button data-view="papers">▤<br>Papers</button><button data-view="data">▦<br>Data</button>
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- <script>  
+ <script> 
+  
+const SUPABASE_URL = 'https://ffxdagjdtgdvobszigto.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_9ZibXwr1L0BRbNkm2Z_A6g_uOnoSqrp';
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
 const $=id=>document.getElementById(id);
 const keys={projects:'rh_projects',papers:'rh_papers',docs:'rh_docs',data:'rh_data',tasks:'rh_tasks'};
 const read=k=>{try{return JSON.parse(localStorage.getItem(keys[k]))||[]}catch{return []}};
