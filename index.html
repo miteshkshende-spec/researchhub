@@ -169,15 +169,6 @@ $('loginForm').addEventListener('submit', async (e) => {
   const password = $('authPassword').value;
   $('authMessage').textContent = 'Signing in...';
 
-  const { error } = await supabaseClient.auth.signInWithPassword({
- //   email,
-   // password
-  //});
-
-//   $('authMessage').textContent = error
-//     ? error.message
-//     : 'Signed in successfully!';
-// });
  
 const $=id=>document.getElementById(id);
 
