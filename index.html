@@ -133,7 +133,7 @@
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  <script> 
-  
+ 
 const SUPABASE_URL = 'https://ffxdagjdtgdvobszigto.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_9ZibXwr1L0BRbNkm2Z_A6g_uOnoSqrp';
 
@@ -150,6 +150,35 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const today=()=>new Date().toLocaleDateString();
 function save(k){localStorage.setItem(keys[k],JSON.stringify(state[k]));renderAll()}
+
+
+async function saveProjectToCloud(project) {
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError) throw userError;
+  if (!user) throw new Error('Please sign in first.');
+
+  const { data, error } = await supabaseClient
+    .from('projects')
+    .insert({
+      user_id: user.id,
+      title: project.title,
+      research_type: project.type,
+      status: project.status,
+      aim: project.aim,
+      methodology: project.method,
+      start_date: project.start || null,
+      due_date: project.due || null
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+
 function del(k,itemId){if(confirm('Delete this record?')){state[k]=state[k].filter(x=>x.id!==itemId);save(k)}}
 function card(title,details,meta,k,itemId,extra=''){return `<article class="record"><h3>${esc(title)}</h3>${details?`<p>${esc(details)}</p>`:''}${extra}<div class="meta"><span>${esc(meta||'')}</span><button class="btn danger small" data-del="${k}:${itemId}">Delete</button></div></article>`}
 function bindDeletes(){document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.del.split(':');del(k,i)})}
