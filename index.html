@@ -353,29 +353,96 @@ function addForm(formId,k,build){$(formId).addEventListener('submit',e=>{e.preve
 $('projectForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  const form = e.currentTarget;
+  const editId = form.dataset.editId;
+
   const project = {
-    id: id(),
     title: $('pTitle').value.trim(),
     type: $('pType').value,
     status: $('pStatus').value,
     aim: $('pAim').value.trim(),
     method: $('pMethod').value.trim(),
     start: $('pStart').value,
-    due: $('pDue').value,
-    created: today()
+    due: $('pDue').value
   };
 
   try {
-    await saveProjectToCloud(project);
-    state.projects.unshift(project);
+    let row;
+
+    const cloudValues = {
+      title: project.title,
+      research_type: project.type,
+      status: project.status,
+      aim: project.aim,
+      methodology: project.method,
+      start_date: project.start || null,
+      due_date: project.due || null
+    };
+
+    if (editId) {
+      const { data, error } = await supabaseClient
+        .from('projects')
+        .update(cloudValues)
+        .eq('id', editId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      row = data;
+    } else {
+      const { data, error } = await supabaseClient
+        .from('projects')
+        .insert({
+          ...cloudValues,
+          user_id: (await supabaseClient.auth.getUser()).data.user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      row = data;
+    }
+
+    const savedProject = {
+      id: row.id,
+      title: row.title,
+      type: row.research_type,
+      status: row.status,
+      aim: row.aim || '',
+      method: row.methodology || '',
+      start: row.start_date || '',
+      due: row.due_date || '',
+      created: row.created_at || today()
+    };
+
+    const index = state.projects.findIndex(
+      p => String(p.id) === String(row.id)
+    );
+
+    if (index >= 0) {
+      state.projects[index] = savedProject;
+    } else {
+      state.projects.unshift(savedProject);
+    }
+
+    delete form.dataset.editId;
+    form.reset();
+    form.querySelector('button[type="submit"], button:not([type])')
+      .textContent = 'Save project';
+
     save('projects');
-    e.target.reset();
-    alert('Project saved to the cloud successfully!');
+
+    alert(editId
+      ? 'Project updated in the cloud successfully!'
+      : 'Project saved to the cloud successfully!');
+
   } catch (error) {
-    console.error('Cloud save failed:', error);
-    alert('Could not save project to the cloud: ' + error.message);
+    console.error('Project save failed:', error);
+    alert('Could not save project: ' + error.message);
   }
 });
+
+
   
 addForm('paperForm','papers',()=>({title:$('paperTitle').value.trim(),authors:$('paperAuthors').value.trim(),year:$('paperYear').value,journal:$('paperJournal').value.trim(),doi:$('paperDoi').value.trim(),keywords:$('paperKeywords').value.trim(),abstract:$('paperAbstract').value.trim(),method:$('paperMethod').value.trim(),findings:$('paperFindings').value.trim(),file:$('paperFile').files[0]?.name||'',created:today()}));
 addForm('docForm','docs',()=>({title:$('dTitle').value.trim(),type:$('dType').value,project:$('dProject').value.trim(),file:$('dFile').files[0]?.name||'',notes:$('dNotes').value.trim(),date:today()}));
