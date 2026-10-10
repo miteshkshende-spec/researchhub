@@ -405,6 +405,25 @@ $('resetPasswordForm').addEventListener('submit', async (e) => {
 //   $('resetPasswordSection').style.display = 'none';
 //   $('authSection').style.display = 'block';
 // });
+   
+async function restoreLoginSession() {
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    console.error('Session check failed:', error.message);
+    return;
+  }
+
+  if (data.session) {
+    $('authSection').style.display = 'none';
+    $('appDashboard').style.display = '';
+  } else {
+    $('authSection').style.display = '';
+    $('appDashboard').style.display = 'none';
+  }
+}
+
+restoreLoginSession();
 
    renderAll();
 </script>
