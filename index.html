@@ -268,6 +268,36 @@ async function saveProjectToCloud(project) {
   if (error) throw error;
   return data;
 }
+   
+async function loadProjectsFromCloud() {
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError) throw userError;
+  if (!user) return;
+
+  const { data, error } = await supabaseClient
+    .from('projects')
+    .select('*')
+    .order('id', { ascending: false });
+
+  if (error) throw error;
+
+  state.projects = data.map(row => ({
+    id: row.id,
+    title: row.title,
+    type: row.research_type,
+    status: row.status,
+    aim: row.aim || '',
+    method: row.methodology || '',
+    start: row.start_date || '',
+    due: row.due_date || '',
+    created: row.created_at || today()
+  }));
+
+  save('projects');
+}
+
 
 
 function del(k,itemId){if(confirm('Delete this record?')){state[k]=state[k].filter(x=>x.id!==itemId);save(k)}}
