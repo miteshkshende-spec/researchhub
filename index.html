@@ -370,8 +370,50 @@ function populateProjectDropdown(){
 
   console.log('Dropdown options:', select.options.length);
 }
+   
+function renderPapers(){
+  const q = $('paperSearch').value.toLowerCase().trim();
+  const year = $('paperYearFilter').value;
+  const journal = $('paperJournalFilter').value;
 
-function renderPapers(){const q=$('paperSearch').value.toLowerCase();const rows=state.papers.filter(x=>(x.title+x.authors+x.keywords+x.abstract+x.method+x.findings+x.journal).toLowerCase().includes(q));$('paperList').innerHTML=rows.length?rows.map(x=>card(x.title,`Authors: ${x.authors||'—'}\nSummary: ${x.abstract||'—'}\nMethod: ${x.method||'—'}\nFindings / limitations / gap: ${x.findings||'—'}\n${x.doi?'DOI/URL: '+x.doi:''}`,`${x.year||'Year unknown'} · ${x.journal||'Source not entered'}${x.file?' · File noted: '+x.file:''}`,'papers',x.id,`${(x.keywords||'').split(',').filter(Boolean).map(t=>`<span class="tag">${esc(t.trim())}</span>`).join('')}`)).join(''):'<div class="empty">No papers match your search. Add a paper to start a literature review.</div>';bindDeletes()}
+  const years = [...new Set(state.papers.map(x => String(x.year || '')).filter(Boolean))].sort((a,b) => Number(b) - Number(a));
+  const journals = [...new Set(state.papers.map(x => (x.journal || '').trim()).filter(Boolean))].sort();
+
+  const yearFilter = $('paperYearFilter');
+  const journalFilter = $('paperJournalFilter');
+
+  yearFilter.innerHTML = '<option value="">All years</option>' +
+    years.map(y => `<option value="${esc(y)}">${esc(y)}</option>`).join('');
+
+  journalFilter.innerHTML = '<option value="">All sources</option>' +
+    journals.map(j => `<option value="${esc(j)}">${esc(j)}</option>`).join('');
+
+  yearFilter.value = years.includes(year) ? year : '';
+  journalFilter.value = journals.includes(journal) ? journal : '';
+
+  const rows = state.papers.filter(x => {
+    const text = [x.title, x.authors, x.keywords, x.abstract, x.method, x.findings, x.journal]
+      .join(' ').toLowerCase();
+
+    return text.includes(q) &&
+      (!yearFilter.value || String(x.year || '') === yearFilter.value) &&
+      (!journalFilter.value || (x.journal || '').trim() === journalFilter.value);
+  });
+
+  $('paperList').innerHTML = rows.length
+    ? rows.map(x => card(
+        x.title,
+        `Authors: ${x.authors || '—'}\nSummary: ${x.abstract || '—'}\nMethod: ${x.method || '—'}\nFindings / limitations / gap: ${x.findings || '—'}\n${x.doi ? 'DOI/URL: ' + x.doi : ''}`,
+        `${x.year || 'Year unknown'} · ${x.journal || 'Source not entered'}${x.file ? ' · File noted: ' + x.file : ''}`,
+        'papers',
+        x.id,
+        `${(x.keywords || '').split(',').filter(Boolean).map(t => `<span class="tag">${esc(t.trim())}</span>`).join('')}`
+      )).join('')
+    : '<div class="empty">No papers match these filters. Try changing your search or filters.</div>';
+
+  bindDeletes();
+}
+
 function renderDocs(){const q=$('docSearch').value.toLowerCase();const rows=state.docs.filter(x=>(x.title+x.type+x.project+x.notes+x.file).toLowerCase().includes(q));$('docList').innerHTML=rows.length?rows.map(x=>card(x.title,`${x.notes||''}${x.file?'\nFilename: '+x.file:''}`,`${x.type}${x.project?' · '+x.project:''} · ${x.date}`,'docs',x.id)).join(''):'<div class="empty">No documents registered yet.</div>';bindDeletes()}
 function renderData(){const q=$('dataSearch').value.toLowerCase();const rows=state.data.filter(x=>(x.name+x.project+x.variable+x.value+x.unit+x.method+x.notes).toLowerCase().includes(q));$('dataList').innerHTML=rows.length?rows.map(x=>card(`${x.name} — ${x.variable||'Observation'}`,`Value: ${x.value||'—'} ${x.unit||''}\nMethod: ${x.method||'—'}\nNotes: ${x.notes||'—'}`,`${x.date||'Date not entered'}${x.project?' · '+x.project:''}`,'data',x.id)).join(''):'<div class="empty">No data records yet. Add an observation or measurement.</div>';bindDeletes()}
 function renderTasks(){const f=$('taskFilter').value;let rows=state.tasks.filter(x=>f==='All tasks'||(f==='Open tasks'?!x.done:x.done));rows.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));$('taskList').innerHTML=rows.length?rows.map(x=>`<article class="record"><div style="display:flex;justify-content:space-between;gap:8px;align-items:start"><h3>${esc(x.title)}</h3><span class="status">${x.done?'DONE':'OPEN'}</span></div><p>${esc(x.project||'No project')} · ${esc(x.priority)} priority${x.assignee?' · '+esc(x.assignee):''}</p><div class="meta"><span>Due: ${esc(x.due||'Not set')}</span><span><button class="btn soft small" data-toggle="${x.id}">${x.done?'Reopen':'Mark complete'}</button> <button class="btn danger small" data-del="tasks:${x.id}">Delete</button></span></div></article>`).join(''):'<div class="empty">No tasks in this view.</div>';document.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>{const t=state.tasks.find(x=>x.id===b.dataset.toggle);t.done=!t.done;save('tasks')});bindDeletes()}
