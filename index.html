@@ -304,7 +304,43 @@ function del(k,itemId){if(confirm('Delete this record?')){state[k]=state[k].filt
 function card(title,details,meta,k,itemId,extra=''){return `<article class="record"><h3>${esc(title)}</h3>${details?`<p>${esc(details)}</p>`:''}${extra}<div class="meta"><span>${esc(meta||'')}</span> 
 <button class="btn soft small" data-edit="${k}:${itemId}">Edit</button>
 <button class="btn danger small" data-del="${k}:${itemId}">Delete</button></div></article>`}
-function bindDeletes(){document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.del.split(':');del(k,i)})}
+ 
+function bindDeletes(){
+  document.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick=()=>{
+      const [k,i]=b.dataset.del.split(':');
+      del(k,i);
+    };
+  });
+
+  document.querySelectorAll('[data-edit]').forEach(b=>{
+    b.onclick=()=>{
+      const [k,i]=b.dataset.edit.split(':');
+
+      if(k!=='projects'){
+        alert('Editing this record type is not available yet.');
+        return;
+      }
+
+      const p=state.projects.find(x=>String(x.id)===i);
+      if(!p) return;
+
+      $('pTitle').value=p.title||'';
+      $('pType').value=p.type||'Engineering';
+      $('pStatus').value=p.status||'Planning';
+      $('pAim').value=p.aim||'';
+      $('pMethod').value=p.method||'';
+      $('pStart').value=p.start||'';
+      $('pDue').value=p.due||'';
+
+      $('projectForm').dataset.editId=p.id;
+      $('projectForm').querySelector('button[type="submit"], button:not([type])').textContent='Update project';
+
+      $('projectForm').scrollIntoView({behavior:'smooth',block:'center'});
+    };
+  });
+}
+{document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.del.split(':');del(k,i)})}
 function renderProjects(){const q=$('projectSearch').value.toLowerCase();const rows=state.projects.filter(x=>(x.title+x.aim+x.method+x.type+x.status).toLowerCase().includes(q));$('projectList').innerHTML=rows.length?rows.map(x=>card(x.title,`Aim: ${x.aim||'—'}\nMethod: ${x.method||'—'}`,`${x.type} · ${x.status}${x.due?' · Due '+x.due:''}`,'projects',x.id,`<span class="tag">${esc(x.status)}</span>`)).join(''):'<div class="empty">No matching projects yet. Add your first research project.</div>';bindDeletes()}
 function renderPapers(){const q=$('paperSearch').value.toLowerCase();const rows=state.papers.filter(x=>(x.title+x.authors+x.keywords+x.abstract+x.method+x.findings+x.journal).toLowerCase().includes(q));$('paperList').innerHTML=rows.length?rows.map(x=>card(x.title,`Authors: ${x.authors||'—'}\nSummary: ${x.abstract||'—'}\nMethod: ${x.method||'—'}\nFindings / limitations / gap: ${x.findings||'—'}\n${x.doi?'DOI/URL: '+x.doi:''}`,`${x.year||'Year unknown'} · ${x.journal||'Source not entered'}${x.file?' · File noted: '+x.file:''}`,'papers',x.id,`${(x.keywords||'').split(',').filter(Boolean).map(t=>`<span class="tag">${esc(t.trim())}</span>`).join('')}`)).join(''):'<div class="empty">No papers match your search. Add a paper to start a literature review.</div>';bindDeletes()}
 function renderDocs(){const q=$('docSearch').value.toLowerCase();const rows=state.docs.filter(x=>(x.title+x.type+x.project+x.notes+x.file).toLowerCase().includes(q));$('docList').innerHTML=rows.length?rows.map(x=>card(x.title,`${x.notes||''}${x.file?'\nFilename: '+x.file:''}`,`${x.type}${x.project?' · '+x.project:''} · ${x.date}`,'docs',x.id)).join(''):'<div class="empty">No documents registered yet.</div>';bindDeletes()}
