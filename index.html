@@ -28,6 +28,21 @@
   </form>
   <p id="authMessage"></p>
 </div>
+  
+<div id="resetPasswordSection" style="display:none;max-width:400px;margin:30px auto;padding:20px;border:1px solid #ddd;border-radius:12px">
+  <h2>Choose a New Password</h2>
+  <form id="resetPasswordForm">
+    <label>New password</label>
+    <input id="newPassword" type="password" required minlength="6"
+      style="display:block;width:100%;padding:10px;margin:8px 0 16px">
+    <label>Confirm new password</label>
+    <input id="confirmNewPassword" type="password" required minlength="6"
+      style="display:block;width:100%;padding:10px;margin:8px 0 16px">
+    <button type="submit">Update password</button>
+  </form>
+  <p id="resetPasswordMessage"></p>
+</div>
+
 
  
 
