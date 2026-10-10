@@ -151,12 +151,18 @@
 <section class="view" id="tasks">
  <div class="sectionhead"><h2>Tasks & deadlines</h2><span class="muted">Plan your next steps</span></div>
  <div class="split">
-  <div class="panel"><h3 style="margin-top:0">Add a task</h3><form id="taskForm">
-   <div class="field"><label>Task *</label><input id="tTitle" required maxlength="180" placeholder="e.g. Finish literature review matrix"></div>
-   <div class="formgrid"><div class="field"><label>Related project</label><input id="tProject" placeholder="Project title"></div><div class="field"><label>Due date</label><input id="tDue" type="date"></div>
-   <div class="field"><label>Priority</label><select id="tPriority"><option>Normal</option><option>High</option><option>Low</option></select></div><div class="field"><label>Assigned to (planning only)</label><input id="tAssignee" placeholder="You / guide / team"></div></div>
-   <button class="btn">Add task</button>
-  </form><p class="muted" style="font-size:11px">Assignments are labels only; they do not send invitations or share data.</p></div>
+   
+<div class="panel"><h3 style="margin-top:0">Add a task</h3><form id="taskForm">
+  <div class="field"><label>Task *</label><input id="tTitle" required maxlength="180" placeholder="e.g. Finish literature review matrix"></div>
+  <div class="formgrid">
+    <div class="field"><label>Related project</label><select id="tProject"><option value="">No project</option></select></div>
+    <div class="field"><label>Due date</label><input id="tDue" type="date"></div>
+    <div class="field"><label>Priority</label><select id="tPriority"><option>Normal</option><option>High</option><option>Low</option></select></div>
+    <div class="field"><label>Assigned to (planning only)</label><input id="tAssignee" placeholder="You / guide / team"></div>
+  </div>
+  <button class="btn">Add task</button>
+</form>
+<p class="muted" style="font-size:11px">Assignments are labels only; they do not send invitations or share data.</p></div>
   <div><div class="field"><label>Filter tasks</label><select class="search" id="taskFilter"><option>All tasks</option><option>Open tasks</option><option>Completed tasks</option></select></div><div id="taskList" class="list"></div></div>
  </div>
 </section>
@@ -345,12 +351,28 @@ function bindDeletes(){
 }
 {document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.del.split(':');del(k,i)})}
 
-function renderProjects(){const q=$('projectSearch').value.toLowerCase();const rows=state.projects.filter(x=>(x.title+x.aim+x.method+x.type+x.status).toLowerCase().includes(q));$('projectList').innerHTML=rows.length?rows.map(x=>card(x.title,`Aim: ${x.aim||'—'}\nMethod: ${x.method||'—'}`,`${x.type} · ${x.status}${x.due?' · Due '+x.due:''}`,'projects',x.id,`<span class="tag">${esc(x.status)}</span><p>Progress: ${Math.min(100,Math.max(0,Number(x.progress)||0))}%</p><progress value="${Math.min(100,Math.max(0,Number(x.progress)||0))}" max="100" style="width:100%"></progress>`)).join(''):'<div class="empty">No matching projects yet. Add your first research project.</div>';bindDeletes()}   
+function renderProjects(){const q=$('projectSearch').value.toLowerCase();const rows=state.projects.filter(x=>(x.title+x.aim+x.method+x.type+x.status).toLowerCase().includes(q));$('projectList').innerHTML=rows.length?rows.map(x=>card(x.title,`Aim: ${x.aim||'—'}\nMethod: ${x.method||'—'}`,`${x.type} · ${x.status}${x.due?' · Due '+x.due:''}`,'projects',x.id,`<span class="tag">${esc(x.status)}</span><p>Progress: ${Math.min(100,Math.max(0,Number(x.progress)||0))}%</p><progress value="${Math.min(100,Math.max(0,Number(x.progress)||0))}" max="100" style="width:100%"></progress>`)).join(''):'<div class="empty">No matching projects yet. Add your first research project.</div>';bindDeletes()}
+  
+function populateProjectDropdown(){
+  const select = $('tProject');
+  const currentValue = select.value;
+  select.innerHTML = '<option value="">No project</option>';
+
+  state.projects.forEach(project => {
+    const option = document.createElement('option');
+    option.value = project.title;
+    option.textContent = project.title;
+    select.appendChild(option);
+  });
+
+  select.value = currentValue;
+}
+ 
 function renderPapers(){const q=$('paperSearch').value.toLowerCase();const rows=state.papers.filter(x=>(x.title+x.authors+x.keywords+x.abstract+x.method+x.findings+x.journal).toLowerCase().includes(q));$('paperList').innerHTML=rows.length?rows.map(x=>card(x.title,`Authors: ${x.authors||'—'}\nSummary: ${x.abstract||'—'}\nMethod: ${x.method||'—'}\nFindings / limitations / gap: ${x.findings||'—'}\n${x.doi?'DOI/URL: '+x.doi:''}`,`${x.year||'Year unknown'} · ${x.journal||'Source not entered'}${x.file?' · File noted: '+x.file:''}`,'papers',x.id,`${(x.keywords||'').split(',').filter(Boolean).map(t=>`<span class="tag">${esc(t.trim())}</span>`).join('')}`)).join(''):'<div class="empty">No papers match your search. Add a paper to start a literature review.</div>';bindDeletes()}
 function renderDocs(){const q=$('docSearch').value.toLowerCase();const rows=state.docs.filter(x=>(x.title+x.type+x.project+x.notes+x.file).toLowerCase().includes(q));$('docList').innerHTML=rows.length?rows.map(x=>card(x.title,`${x.notes||''}${x.file?'\nFilename: '+x.file:''}`,`${x.type}${x.project?' · '+x.project:''} · ${x.date}`,'docs',x.id)).join(''):'<div class="empty">No documents registered yet.</div>';bindDeletes()}
 function renderData(){const q=$('dataSearch').value.toLowerCase();const rows=state.data.filter(x=>(x.name+x.project+x.variable+x.value+x.unit+x.method+x.notes).toLowerCase().includes(q));$('dataList').innerHTML=rows.length?rows.map(x=>card(`${x.name} — ${x.variable||'Observation'}`,`Value: ${x.value||'—'} ${x.unit||''}\nMethod: ${x.method||'—'}\nNotes: ${x.notes||'—'}`,`${x.date||'Date not entered'}${x.project?' · '+x.project:''}`,'data',x.id)).join(''):'<div class="empty">No data records yet. Add an observation or measurement.</div>';bindDeletes()}
 function renderTasks(){const f=$('taskFilter').value;let rows=state.tasks.filter(x=>f==='All tasks'||(f==='Open tasks'?!x.done:x.done));rows.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));$('taskList').innerHTML=rows.length?rows.map(x=>`<article class="record"><div style="display:flex;justify-content:space-between;gap:8px;align-items:start"><h3>${esc(x.title)}</h3><span class="status">${x.done?'DONE':'OPEN'}</span></div><p>${esc(x.project||'No project')} · ${esc(x.priority)} priority${x.assignee?' · '+esc(x.assignee):''}</p><div class="meta"><span>Due: ${esc(x.due||'Not set')}</span><span><button class="btn soft small" data-toggle="${x.id}">${x.done?'Reopen':'Mark complete'}</button> <button class="btn danger small" data-del="tasks:${x.id}">Delete</button></span></div></article>`).join(''):'<div class="empty">No tasks in this view.</div>';document.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>{const t=state.tasks.find(x=>x.id===b.dataset.toggle);t.done=!t.done;save('tasks')});bindDeletes()}
-function renderAll(){renderProjects();renderPapers();renderDocs();renderData();renderTasks();$('sProjects').textContent=state.projects.length;$('sPapers').textContent=state.papers.length;$('sDocs').textContent=state.docs.length;$('sData').textContent=state.data.length}
+function renderAll(){renderProjects();populateProjectDropdown();renderPapers();renderDocs();renderData();renderTasks();$('sProjects').textContent=state.projects.length;$('sPapers').textContent=state.papers.length;$('sDocs').textContent=state.docs.length;$('sData').textContent=state.data.length}
 function addForm(formId,k,build){$(formId).addEventListener('submit',e=>{e.preventDefault();state[k].unshift({id:id(),...build()});save(k);e.target.reset()})}
    
  
