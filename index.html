@@ -355,9 +355,8 @@ function renderProjects(){const q=$('projectSearch').value.toLowerCase();const r
   
 function populateProjectDropdown(){
   const select = $('tProject');
-  const currentValue = select.value;
   select.innerHTML = '<option value="">No project</option>';
-console.log('Projects for dropdown:', state.projects);
+
   state.projects.forEach(project => {
     const option = document.createElement('option');
     option.value = project.title;
@@ -365,8 +364,10 @@ console.log('Projects for dropdown:', state.projects);
     select.appendChild(option);
   });
 
-  select.value = currentValue;
+  console.log('Dropdown options:', select.options.length);
 }
+
+
  
 function renderPapers(){const q=$('paperSearch').value.toLowerCase();const rows=state.papers.filter(x=>(x.title+x.authors+x.keywords+x.abstract+x.method+x.findings+x.journal).toLowerCase().includes(q));$('paperList').innerHTML=rows.length?rows.map(x=>card(x.title,`Authors: ${x.authors||'—'}\nSummary: ${x.abstract||'—'}\nMethod: ${x.method||'—'}\nFindings / limitations / gap: ${x.findings||'—'}\n${x.doi?'DOI/URL: '+x.doi:''}`,`${x.year||'Year unknown'} · ${x.journal||'Source not entered'}${x.file?' · File noted: '+x.file:''}`,'papers',x.id,`${(x.keywords||'').split(',').filter(Boolean).map(t=>`<span class="tag">${esc(t.trim())}</span>`).join('')}`)).join(''):'<div class="empty">No papers match your search. Add a paper to start a literature review.</div>';bindDeletes()}
 function renderDocs(){const q=$('docSearch').value.toLowerCase();const rows=state.docs.filter(x=>(x.title+x.type+x.project+x.notes+x.file).toLowerCase().includes(q));$('docList').innerHTML=rows.length?rows.map(x=>card(x.title,`${x.notes||''}${x.file?'\nFilename: '+x.file:''}`,`${x.type}${x.project?' · '+x.project:''} · ${x.date}`,'docs',x.id)).join(''):'<div class="empty">No documents registered yet.</div>';bindDeletes()}
