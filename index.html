@@ -293,6 +293,7 @@ async function loadProjectsFromCloud() {
     method: row.methodology || '',
     start: row.start_date || '',
     due: row.due_date || '',
+    progress: row.progress ?? 0,
     created: row.created_at || today()
   }));
 
@@ -333,6 +334,7 @@ function bindDeletes(){
       $('pMethod').value=p.method||'';
       $('pStart').value=p.start||'';
       $('pDue').value=p.due||'';
+      $('pProgress').value=p.progress??0;
 
       $('projectForm').dataset.editId=p.id;
       $('projectForm').querySelector('button[type="submit"], button:not([type])').textContent='Update project';
@@ -342,7 +344,8 @@ function bindDeletes(){
   });
 }
 {document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.del.split(':');del(k,i)})}
-function renderProjects(){const q=$('projectSearch').value.toLowerCase();const rows=state.projects.filter(x=>(x.title+x.aim+x.method+x.type+x.status).toLowerCase().includes(q));$('projectList').innerHTML=rows.length?rows.map(x=>card(x.title,`Aim: ${x.aim||'—'}\nMethod: ${x.method||'—'}`,`${x.type} · ${x.status}${x.due?' · Due '+x.due:''}`,'projects',x.id,`<span class="tag">${esc(x.status)}</span>`)).join(''):'<div class="empty">No matching projects yet. Add your first research project.</div>';bindDeletes()}
+
+function renderProjects(){const q=$('projectSearch').value.toLowerCase();const rows=state.projects.filter(x=>(x.title+x.aim+x.method+x.type+x.status).toLowerCase().includes(q));$('projectList').innerHTML=rows.length?rows.map(x=>card(x.title,`Aim: ${x.aim||'—'}\nMethod: ${x.method||'—'}`,`${x.type} · ${x.status}${x.due?' · Due '+x.due:''}`,'projects',x.id,`<span class="tag">${esc(x.status)}</span><p>Progress: ${Math.min(100,Math.max(0,Number(x.progress)||0))}%</p><progress value="${Math.min(100,Math.max(0,Number(x.progress)||0))}" max="100" style="width:100%"></progress>`)).join(''):'<div class="empty">No matching projects yet. Add your first research project.</div>';bindDeletes()}   
 function renderPapers(){const q=$('paperSearch').value.toLowerCase();const rows=state.papers.filter(x=>(x.title+x.authors+x.keywords+x.abstract+x.method+x.findings+x.journal).toLowerCase().includes(q));$('paperList').innerHTML=rows.length?rows.map(x=>card(x.title,`Authors: ${x.authors||'—'}\nSummary: ${x.abstract||'—'}\nMethod: ${x.method||'—'}\nFindings / limitations / gap: ${x.findings||'—'}\n${x.doi?'DOI/URL: '+x.doi:''}`,`${x.year||'Year unknown'} · ${x.journal||'Source not entered'}${x.file?' · File noted: '+x.file:''}`,'papers',x.id,`${(x.keywords||'').split(',').filter(Boolean).map(t=>`<span class="tag">${esc(t.trim())}</span>`).join('')}`)).join(''):'<div class="empty">No papers match your search. Add a paper to start a literature review.</div>';bindDeletes()}
 function renderDocs(){const q=$('docSearch').value.toLowerCase();const rows=state.docs.filter(x=>(x.title+x.type+x.project+x.notes+x.file).toLowerCase().includes(q));$('docList').innerHTML=rows.length?rows.map(x=>card(x.title,`${x.notes||''}${x.file?'\nFilename: '+x.file:''}`,`${x.type}${x.project?' · '+x.project:''} · ${x.date}`,'docs',x.id)).join(''):'<div class="empty">No documents registered yet.</div>';bindDeletes()}
 function renderData(){const q=$('dataSearch').value.toLowerCase();const rows=state.data.filter(x=>(x.name+x.project+x.variable+x.value+x.unit+x.method+x.notes).toLowerCase().includes(q));$('dataList').innerHTML=rows.length?rows.map(x=>card(`${x.name} — ${x.variable||'Observation'}`,`Value: ${x.value||'—'} ${x.unit||''}\nMethod: ${x.method||'—'}\nNotes: ${x.notes||'—'}`,`${x.date||'Date not entered'}${x.project?' · '+x.project:''}`,'data',x.id)).join(''):'<div class="empty">No data records yet. Add an observation or measurement.</div>';bindDeletes()}
@@ -364,7 +367,8 @@ $('projectForm').addEventListener('submit', async (e) => {
     aim: $('pAim').value.trim(),
     method: $('pMethod').value.trim(),
     start: $('pStart').value,
-    due: $('pDue').value
+due: $('pDue').value,
+progress: Math.min(100, Math.max(0, Number($('pProgress').value) || 0))
   };
 
   try {
@@ -378,6 +382,7 @@ $('projectForm').addEventListener('submit', async (e) => {
       methodology: project.method,
       start_date: project.start || null,
       due_date: project.due || null
+      progress: project.progress
     };
 
     if (editId) {
@@ -413,6 +418,7 @@ $('projectForm').addEventListener('submit', async (e) => {
       method: row.methodology || '',
       start: row.start_date || '',
       due: row.due_date || '',
+      progress: row.progress ?? 0,
       created: row.created_at || today()
     };
 
