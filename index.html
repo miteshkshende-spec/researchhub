@@ -315,10 +315,15 @@ $('forgotPasswordButton').addEventListener('click', async () => {
   }
 });
    
+   
+async function showPasswordReset() {
+  $('authSection').style.display = 'none';
+  $('resetPasswordSection').style.display = 'block';
+}
+
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
   if (event === 'PASSWORD_RECOVERY') {
-    $('authSection').style.display = 'none';
-    $('resetPasswordSection').style.display = 'block';
+    await showPasswordReset();
   }
 });
 
@@ -327,30 +332,79 @@ $('resetPasswordForm').addEventListener('submit', async (e) => {
 
   const password = $('newPassword').value;
   const confirmPassword = $('confirmNewPassword').value;
+  const message = $('resetPasswordMessage');
+
+  if (password.length < 6) {
+    message.textContent = 'Password must be at least 6 characters.';
+    return;
+  }
 
   if (password !== confirmPassword) {
-    $('resetPasswordMessage').textContent = 'Passwords do not match.';
+    message.textContent = 'Passwords do not match.';
     return;
   }
 
-  $('resetPasswordMessage').textContent = 'Updating password...';
+  message.textContent = 'Updating password...';
 
-  const { error } = await supabaseClient.auth.updateUser({
-    password: password
-  });
+  try {
+    const { error } = await supabaseClient.auth.updateUser({
+      password: password
+    });
 
-  if (error) {
-    $('resetPasswordMessage').textContent = error.message;
-    return;
+    if (error) {
+      message.textContent = error.message;
+      return;
+    }
+
+    message.textContent =
+      'Password updated! Please sign in with your new password.';
+
+    $('resetPasswordForm').reset();
+    $('resetPasswordSection').style.display = 'none';
+    $('authSection').style.display = 'block';
+  } catch (err) {
+    message.textContent = 'Could not update password. Please try again.';
+    console.error(err);
   }
-
-  $('resetPasswordMessage').textContent =
-    'Password updated successfully! You can now sign in.';
-
-  $('resetPasswordForm').reset();
-  $('resetPasswordSection').style.display = 'none';
-  $('authSection').style.display = 'block';
 });
+
+  
+// supabaseClient.auth.onAuthStateChange(async (event, session) => {
+//   if (event === 'PASSWORD_RECOVERY') {
+//     $('authSection').style.display = 'none';
+//     $('resetPasswordSection').style.display = 'block';
+//   }
+// });
+
+// $('resetPasswordForm').addEventListener('submit', async (e) => {
+//   e.preventDefault();
+
+//   const password = $('newPassword').value;
+//   const confirmPassword = $('confirmNewPassword').value;
+
+//   if (password !== confirmPassword) {
+//     $('resetPasswordMessage').textContent = 'Passwords do not match.';
+//     return;
+//   }
+
+//   $('resetPasswordMessage').textContent =
+//   $('resetPasswordMessage').textContent = 'Updating password...';
+
+//   const { error } = await supabaseClient.auth.updateUser({
+//     password: password
+//   });
+
+//   if (error) {
+//     $('resetPasswordMessage').textContent = error.message;
+//     return;
+//   }
+
+//     'Password updated successfully! You can now sign in.';
+
+//   $('resetPasswordForm').reset();
+//   $('resetPasswordSection').style.display = 'none';
+//   $('authSection').style.display = 'block';
+// });
 
    renderAll();
 </script>
