@@ -194,7 +194,7 @@ $('loginForm').addEventListener('submit', async (e) => {
       $('authMessage').textContent = error.message;
       return;
     }
-
+    await loadProjectsFromCloud();
     $('authMessage').textContent = 'Signed in successfully!';
     $('authSection').style.display = 'none';
     $('appDashboard').style.display = '';
