@@ -314,6 +314,44 @@ $('forgotPasswordButton').addEventListener('click', async () => {
     console.error(err);
   }
 });
+   
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    $('authSection').style.display = 'none';
+    $('resetPasswordSection').style.display = 'block';
+  }
+});
+
+$('resetPasswordForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const password = $('newPassword').value;
+  const confirmPassword = $('confirmNewPassword').value;
+
+  if (password !== confirmPassword) {
+    $('resetPasswordMessage').textContent = 'Passwords do not match.';
+    return;
+  }
+
+  $('resetPasswordMessage').textContent = 'Updating password...';
+
+  const { error } = await supabaseClient.auth.updateUser({
+    password: password
+  });
+
+  if (error) {
+    $('resetPasswordMessage').textContent = error.message;
+    return;
+  }
+
+  $('resetPasswordMessage').textContent =
+    'Password updated successfully! You can now sign in.';
+
+  $('resetPasswordForm').reset();
+  $('resetPasswordSection').style.display = 'none';
+  $('authSection').style.display = 'block';
+});
+
    renderAll();
 </script>
 </body></html>
