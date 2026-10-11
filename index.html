@@ -757,6 +757,7 @@ async function restoreLoginSession() {
 
     if (data.session) {
       await loadProjectsFromCloud();
+      await loadPapersFromCloud();
       populateProjectDropdown();
 
       $('authSection').style.display = 'none';
