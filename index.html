@@ -231,6 +231,7 @@ $('loginForm').addEventListener('submit', async (e) => {
       return;
     }
     await loadProjectsFromCloud();
+    await loadPapersFromCloud();
     $('authMessage').textContent = 'Signed in successfully!';
     $('authSection').style.display = 'none';
     $('appDashboard').style.display = '';
