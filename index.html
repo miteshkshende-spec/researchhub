@@ -330,17 +330,12 @@ async function loadProjectsFromCloud() {
     progress: row.progress ?? 0,
     created: row.created_at || today()
   }));
-
   save('projects');
 }
-
-
-
 function del(k,itemId){if(confirm('Delete this record?')){state[k]=state[k].filter(x=>x.id!==itemId);save(k)}}
 function card(title,details,meta,k,itemId,extra=''){return `<article class="record"><h3>${esc(title)}</h3>${details?`<p>${esc(details)}</p>`:''}${extra}<div class="meta"><span>${esc(meta||'')}</span> 
 <button class="btn soft small" data-edit="${k}:${itemId}">Edit</button>
-<button class="btn danger small" data-del="${k}:${itemId}">Delete</button></div></article>`}
- 
+<button class="btn danger small" data-del="${k}:${itemId}">Delete</button></div></article>`} 
 function bindDeletes(){
   document.querySelectorAll('[data-del]').forEach(b=>{
     b.onclick=()=>{
@@ -348,7 +343,6 @@ function bindDeletes(){
       del(k,i);
     };
   });
-
   document.querySelectorAll('[data-edit]').forEach(b=>{
     b.onclick=()=>{
       const [k,i]=b.dataset.edit.split(':');
@@ -377,10 +371,7 @@ function bindDeletes(){
     };
   });
 }
-{document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.del.split(':');del(k,i)})}
-
-function renderProjects(){const q=$('projectSearch').value.toLowerCase();const rows=state.projects.filter(x=>(x.title+x.aim+x.method+x.type+x.status).toLowerCase().includes(q));$('projectList').innerHTML=rows.length?rows.map(x=>card(x.title,`Aim: ${x.aim||'—'}\nMethod: ${x.method||'—'}`,`${x.type} · ${x.status}${x.due?' · Due '+x.due:''}`,'projects',x.id,`<span class="tag">${esc(x.status)}</span><p>Progress: ${Math.min(100,Math.max(0,Number(x.progress)||0))}%</p><progress value="${Math.min(100,Math.max(0,Number(x.progress)||0))}" max="100" style="width:100%"></progress>`)).join(''):'<div class="empty">No matching projects yet. Add your first research project.</div>';bindDeletes()}
-  
+function renderProjects(){const q=$('projectSearch').value.toLowerCase();const rows=state.projects.filter(x=>(x.title+x.aim+x.method+x.type+x.status).toLowerCase().includes(q));$('projectList').innerHTML=rows.length?rows.map(x=>card(x.title,`Aim: ${x.aim||'—'}\nMethod: ${x.method||'—'}`,`${x.type} · ${x.status}${x.due?' · Due '+x.due:''}`,'projects',x.id,`<span class="tag">${esc(x.status)}</span><p>Progress: ${Math.min(100,Math.max(0,Number(x.progress)||0))}%</p><progress value="${Math.min(100,Math.max(0,Number(x.progress)||0))}" max="100" style="width:100%"></progress>`)).join(''):'<div class="empty">No matching projects yet. Add your first research project.</div>';bindDeletes()}   
 function populateProjectDropdown(){
   const select = $('tProject');
   select.innerHTML = '<option value="">No project</option>';
