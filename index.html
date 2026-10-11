@@ -119,6 +119,30 @@
 <div class="field"><label>Filter by year</label><select id="paperYearFilter"><option value="">All years</option></select></div>
 <div class="field"><label>Filter by journal / source</label><select id="paperJournalFilter"><option value="">All sources</option></select></div>
 <div id="paperList" class="list"></div></div>
+  
+<div class="panel" style="margin-top:16px">
+  <h3 style="margin-top:0">Citation generator</h3>
+  <div class="field">
+    <label for="citationPaper">Choose a saved paper</label>
+    <select id="citationPaper">
+      <option value="">Select a paper</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="citationStyle">Citation style</label>
+    <select id="citationStyle">
+      <option value="apa">APA 7th edition</option>
+      <option value="mla">MLA 9th edition</option>
+      <option value="ieee">IEEE</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="citationOutput">Generated citation</label>
+    <textarea id="citationOutput" rows="4" readonly placeholder="Your citation will appear here"></textarea>
+  </div>
+  <button class="btn" type="button" id="copyCitation">Copy citation</button>
+</div>
+ 
  </div>
 </section>
 
