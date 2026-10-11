@@ -534,8 +534,64 @@ progress: Math.min(100, Math.max(0, Number($('pProgress').value) || 0))
 
 
   
-  addForm('paperForm','papers',()=>({title:$('paperTitle').value.trim(),authors:$('paperAuthors').value.trim(),year:$('paperYear').value,journal:$('paperJournal').value.trim(),doi:$('paperDoi').value.trim(),keywords:$('paperKeywords').value.trim(),abstract:$('paperAbstract').value.trim(),method:$('paperMethod').value.trim(),findings:$('paperFindings').value.trim(),file:$('paperFile').files[0]?.name||'',created:today()}));
-addForm('docForm','docs',()=>({title:$('dTitle').value.trim(),type:$('dType').value,project:$('dProject').value.trim(),file:$('dFile').files[0]?.name||'',notes:$('dNotes').value.trim(),date:today()}));
+
+$('paperForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  try {
+    const { data: { user }, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError) throw userError;
+    if (!user) throw new Error('Please log in first.');
+
+    const paperValues = {
+      user_id: user.id,
+      title: $('paperTitle').value.trim(),
+      authors: $('paperAuthors').value.trim(),
+      year: $('paperYear').value,
+      journal: $('paperJournal').value.trim(),
+      doi_url: $('paperDoi').value.trim(),
+      keywords: $('paperKeywords').value.trim(),
+      summary: $('paperAbstract').value.trim(),
+      methodology: $('paperMethod').value.trim(),
+      findings: $('paperFindings').value.trim(),
+      pdf_link: $('paperFile').files[0]?.name || ''
+    };
+
+    const { data, error } = await supabaseClient
+      .from('papers')
+      .insert(paperValues)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    state.papers.unshift({
+      id: String(data.id),
+      title: data.title,
+      authors: data.authors || '',
+      year: data.year || '',
+      journal: data.journal || '',
+      doi: data.doi_url || '',
+      keywords: data.keywords || '',
+      abstract: data.summary || '',
+      method: data.methodology || '',
+      findings: data.findings || '',
+      file: data.pdf_link || '',
+      created: data.created_at || today()
+    });
+
+    save('papers');
+    e.target.reset();
+    alert('Paper saved successfully!');
+  } catch (error) {
+    console.error('Paper save failed:', error);
+    alert('Could not save paper: ' + error.message);
+  }
+});
+
+   addForm('docForm','docs',()=>({title:$('dTitle').value.trim(),type:$('dType').value,project:$('dProject').value.trim(),file:$('dFile').files[0]?.name||'',notes:$('dNotes').value.trim(),date:today()}));
 addForm('dataForm','data',()=>({name:$('xName').value.trim(),project:$('xProject').value.trim(),date:$('xDate').value,variable:$('xVariable').value.trim(),value:$('xValue').value.trim(),unit:$('xUnit').value.trim(),method:$('xMethod').value.trim(),notes:$('xNotes').value.trim()}));
 addForm('taskForm','tasks',()=>({title:$('tTitle').value.trim(),project:$('tProject').value.trim(),due:$('tDue').value,priority:$('tPriority').value,assignee:$('tAssignee').value.trim(),done:false}));
 [['projectSearch',renderProjects],['paperSearch',renderPapers],['docSearch',renderDocs],['dataSearch',renderData],['taskFilter',renderTasks]].forEach(([id,fn])=>$(id).addEventListener('input',fn));
