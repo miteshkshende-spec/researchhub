@@ -714,6 +714,39 @@ $('resetPasswordForm').addEventListener('submit', async (e) => {
 //   $('resetPasswordSection').style.display = 'none';
 //   $('authSection').style.display = 'block';
 // });
+
+async function loadPapersFromCloud() {
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError) throw userError;
+  if (!user) return;
+
+  const { data, error } = await supabaseClient
+    .from('papers')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('id', { ascending: false });
+
+  if (error) throw error;
+
+  state.papers = data.map(row => ({
+    id: String(row.id),
+    title: row.title,
+    authors: row.authors || '',
+    year: row.year || '',
+    journal: row.journal || '',
+    doi: row.doi_url || '',
+    keywords: row.keywords || '',
+    abstract: row.summary || '',
+    method: row.methodology || '',
+    findings: row.findings || '',
+    file: row.pdf_link || '',
+    created: row.created_at || today()
+  }));
+
+  save('papers');
+}
   
 async function restoreLoginSession() {
   try {
