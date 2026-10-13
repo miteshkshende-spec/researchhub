@@ -928,6 +928,34 @@ async function loadResearchDataFromCloud() {
 }
 
    
+async function loadDocumentsFromCloud() {
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError) throw userError;
+  if (!user) return;
+
+  const { data, error } = await supabaseClient
+    .from('documents')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('id', { ascending: false });
+
+  if (error) throw error;
+
+  state.docs = data.map(row => ({
+    id: String(row.id),
+    title: row.title || '',
+    type: row.type || '',
+    project: row.project || '',
+    file: row.file || '',
+    notes: row.notes || '',
+    date: row.date || ''
+  }));
+
+  save('docs');
+}
+   
    async function restoreLoginSession() {
   try {
     const { data, error } =
@@ -939,6 +967,7 @@ async function loadResearchDataFromCloud() {
       await loadProjectsFromCloud();
       await loadPapersFromCloud();
       await loadResearchDataFromCloud();
+      await loadDocumentsFromCloud();    // for cloud storage 
       populateProjectDropdown();
 
       $('authSection').style.display = 'none';
