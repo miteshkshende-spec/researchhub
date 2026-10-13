@@ -592,7 +592,53 @@ $('paperForm').addEventListener('submit', async (e) => {
   }
 });
 
-   addForm('docForm','docs',()=>({title:$('dTitle').value.trim(),type:$('dType').value,project:$('dProject').value.trim(),file:$('dFile').files[0]?.name||'',notes:$('dNotes').value.trim(),date:today()}));
+$('docForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  try {
+    const { data: { user }, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError) throw userError;
+    if (!user) throw new Error('Please log in first.');
+
+    const documentValues = {
+      user_id: user.id,
+      title: $('dTitle').value.trim(),
+      type: $('dType').value,
+      project: $('dProject').value.trim(),
+      file: $('dFile').files[0]?.name || '',
+      notes: $('dNotes').value.trim(),
+      date: today()
+    };
+
+    const { data, error } = await supabaseClient
+      .from('documents')
+      .insert(documentValues)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    state.docs.unshift({
+      id: String(data.id),
+      title: data.title,
+      type: data.type || '',
+      project: data.project || '',
+      file: data.file || '',
+      notes: data.notes || '',
+      date: data.date || today()
+    });
+
+    save('docs');
+    e.target.reset();
+    alert('Document saved successfully!');
+  } catch (error) {
+    console.error('Document save failed:', error);
+    alert('Could not save document: ' + error.message);
+  }
+});
+
 addForm('dataForm','data',()=>({name:$('xName').value.trim(),project:$('xProject').value.trim(),date:$('xDate').value,variable:$('xVariable').value.trim(),value:$('xValue').value.trim(),unit:$('xUnit').value.trim(),method:$('xMethod').value.trim(),notes:$('xNotes').value.trim()}));
 addForm('taskForm','tasks',()=>({title:$('tTitle').value.trim(),project:$('tProject').value.trim(),due:$('tDue').value,priority:$('tPriority').value,assignee:$('tAssignee').value.trim(),done:false}));
 [['projectSearch',renderProjects],['paperSearch',renderPapers],['docSearch',renderDocs],['dataSearch',renderData],['taskFilter',renderTasks]].forEach(([id,fn])=>$(id).addEventListener('input',fn));
