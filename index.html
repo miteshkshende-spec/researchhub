@@ -908,7 +908,7 @@ async function loadResearchDataFromCloud() {
     .from('research_data')
     .select('*')
     .eq('user_id', user.id)
-    .order('id', { ascending: false });
+    
 
   if (error) throw error;
 
