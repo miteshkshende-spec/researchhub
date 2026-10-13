@@ -896,7 +896,39 @@ async function loadPapersFromCloud() {
   save('papers');
 }
   
-async function restoreLoginSession() {
+
+async function loadResearchDataFromCloud() {
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError) throw userError;
+  if (!user) return;
+
+  const { data, error } = await supabaseClient
+    .from('research_data')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('id', { ascending: false });
+
+  if (error) throw error;
+
+  state.data = data.map(row => ({
+    id: String(row.id),
+    name: row.name || '',
+    project: row.project || '',
+    date: row.date || '',
+    variable: row.variable || '',
+    value: row.value || '',
+    unit: row.unit || '',
+    method: row.method || '',
+    notes: row.notes || ''
+  }));
+
+  save('data');
+}
+
+   
+   async function restoreLoginSession() {
   try {
     const { data, error } =
       await supabaseClient.auth.getSession();
@@ -906,6 +938,7 @@ async function restoreLoginSession() {
     if (data.session) {
       await loadProjectsFromCloud();
       await loadPapersFromCloud();
+      await loadResearchDataFromCloud();
       populateProjectDropdown();
 
       $('authSection').style.display = 'none';
