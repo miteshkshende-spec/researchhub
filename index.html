@@ -639,7 +639,108 @@ $('docForm').addEventListener('submit', async (e) => {
   }
 });
 
-addForm('dataForm','data',()=>({name:$('xName').value.trim(),project:$('xProject').value.trim(),date:$('xDate').value,variable:$('xVariable').value.trim(),value:$('xValue').value.trim(),unit:$('xUnit').value.trim(),method:$('xMethod').value.trim(),notes:$('xNotes').value.trim()}));
+$('dataForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  try {
+    const { data: { user }, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError) throw userError;
+    if (!user) throw new Error('Please log in first.');
+
+    const researchValues = {
+      user_id: user.id,
+      name: $('xName').value.trim(),
+      project: $('xProject').value.trim(),
+      date: $('xDate').value || null,
+      variable: $('xVariable').value.trim(),
+      value: $('xValue').value.trim(),
+      unit: $('xUnit').value.trim(),
+      method: $('xMethod').value.trim(),
+      notes: $('xNotes').value.trim()
+    };
+
+    const { data, error } = await supabaseClient
+      .from('research_data')
+      .insert(researchValues)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    state.data.unshift({
+      id: String(data.id),
+      name: data.name || '',
+      project: data.project || '',
+      date: data.date || '',
+      variable: data.variable || '',
+      value: data.value || '',
+      unit: data.unit || '',
+      method: data.method || '',
+      notes: data.notes || ''
+    });
+
+    save('data');
+    e.target.reset();
+    alert('Research data saved successfully!');
+  } catch (error) {
+    console.error('Research data save failed:', error);
+    alert('Could not save research data: ' + error.message);
+  }
+});
+
+$('dataForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  try {
+    const { data: { user }, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError) throw userError;
+    if (!user) throw new Error('Please log in first.');
+
+    const researchValues = {
+      user_id: user.id,
+      name: $('xName').value.trim(),
+      project: $('xProject').value.trim(),
+      date: $('xDate').value || null,
+      variable: $('xVariable').value.trim(),
+      value: $('xValue').value.trim(),
+      unit: $('xUnit').value.trim(),
+      method: $('xMethod').value.trim(),
+      notes: $('xNotes').value.trim()
+    };
+
+    const { data, error } = await supabaseClient
+      .from('research_data')
+      .insert(researchValues)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    state.data.unshift({
+      id: String(data.id),
+      name: data.name || '',
+      project: data.project || '',
+      date: data.date || '',
+      variable: data.variable || '',
+      value: data.value || '',
+      unit: data.unit || '',
+      method: data.method || '',
+      notes: data.notes || ''
+    });
+
+    save('data');
+    e.target.reset();
+    alert('Research data saved successfully!');
+  } catch (error) {
+    console.error('Research data save failed:', error);
+    alert('Could not save research data: ' + error.message);
+  }
+});
+
 addForm('taskForm','tasks',()=>({title:$('tTitle').value.trim(),project:$('tProject').value.trim(),due:$('tDue').value,priority:$('tPriority').value,assignee:$('tAssignee').value.trim(),done:false}));
 [['projectSearch',renderProjects],['paperSearch',renderPapers],['docSearch',renderDocs],['dataSearch',renderData],['taskFilter',renderTasks]].forEach(([id,fn])=>$(id).addEventListener('input',fn));
 const titles={home:'Research overview',projects:'Research projects',papers:'Paper library & literature review',documents:'Documents & paperwork',data:'Research data collection',tasks:'Tasks & deadlines'};
