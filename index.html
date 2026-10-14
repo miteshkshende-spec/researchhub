@@ -455,6 +455,23 @@ document.querySelectorAll('[data-toggle]').forEach(b => {
         .eq('user_id', user.id);
 
       if (error) throw error;
+      
+
+const { data: updatedTask, error } = await supabaseClient
+  .from('Task')
+  .update({ completed: newDone })
+  .eq('id', t.id)
+  .eq('user_id', user.id)
+  .select('id, completed')
+  .maybeSingle();
+
+if (error) throw error;
+
+if (!updatedTask) {
+  throw new Error(
+    'No task row was updated. The task ID or user ownership did not match.'
+  );
+}
 
       t.done = newDone;
       save('tasks');
