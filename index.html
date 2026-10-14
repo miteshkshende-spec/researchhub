@@ -448,14 +448,6 @@ document.querySelectorAll('[data-toggle]').forEach(b => {
       if (userError) throw userError;
       if (!user) throw new Error('Please log in again.');
 
-      const { error } = await supabaseClient
-        .from('Task')
-        .update({ completed: newDone })
-        .eq('id', t.id)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-      
 
 const { data: updatedTask, error } = await supabaseClient
   .from('Task')
