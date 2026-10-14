@@ -741,8 +741,57 @@ $('dataForm').addEventListener('submit', async (e) => {
   }
 });
 
-addForm('taskForm','tasks',()=>({title:$('tTitle').value.trim(),project:$('tProject').value.trim(),due:$('tDue').value,priority:$('tPriority').value,assignee:$('tAssignee').value.trim(),done:false}));
-[['projectSearch',renderProjects],['paperSearch',renderPapers],['docSearch',renderDocs],['dataSearch',renderData],['taskFilter',renderTasks]].forEach(([id,fn])=>$(id).addEventListener('input',fn));
+
+$('taskForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  try {
+    const { data: { user }, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError) throw userError;
+    if (!user) throw new Error('Please log in first.');
+
+    const taskValues = {
+      user_id: user.id,
+      title: $('tTitle').value.trim(),
+      project: $('tProject').value.trim(),
+      due: $('tDue').value || null,
+      priority: $('tPriority').value,
+      assignee: $('tAssignee').value.trim(),
+      completed: false
+    };
+
+    const { data, error } = await supabaseClient
+      .from('Task')
+      .insert(taskValues)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    state.tasks.unshift({
+      id: String(data.id),
+      title: data.title,
+      project: data.project || '',
+      due: data.due || '',
+      priority: data.priority || 'Normal',
+      assignee: data.assignee || '',
+      done: data.completed || false
+    });
+
+    save('tasks');
+    e.target.reset();
+    renderTasks();
+
+    alert('Task saved successfully!');
+  } catch (error) {
+    console.error('Task save failed:', error);
+    alert('Could not save task: ' + error.message);
+  }
+});
+
+   [['projectSearch',renderProjects],['paperSearch',renderPapers],['docSearch',renderDocs],['dataSearch',renderData],['taskFilter',renderTasks]].forEach(([id,fn])=>$(id).addEventListener('input',fn));
 const titles={home:'Research overview',projects:'Research projects',papers:'Paper library & literature review',documents:'Documents & paperwork',data:'Research data collection',tasks:'Tasks & deadlines'};
 function go(v){document.querySelectorAll('.view').forEach(e=>e.classList.toggle('active',e.id===v));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('pageTitle').textContent=titles[v]||'ResearchHub';window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.view)));document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.goto)));
@@ -955,6 +1004,36 @@ async function loadDocumentsFromCloud() {
 
   save('docs');
 }
+
+   
+async function loadTasksFromCloud() {
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+  if (userError) throw userError;
+  if (!user) return;
+
+  const { data, error } = await supabaseClient
+    .from('Task')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('id', { ascending: false });
+
+  if (error) throw error;
+
+  state.tasks = data.map(row => ({
+    id: String(row.id),
+    title: row.title || '',
+    project: row.project || '',
+    due: row.due || '',
+    priority: row.priority || 'Normal',
+    assignee: row.assignee || '',
+    done: row.completed || false
+  }));
+
+  save('tasks');
+}
+
    
    async function restoreLoginSession() {
   try {
@@ -967,7 +1046,8 @@ async function loadDocumentsFromCloud() {
       await loadProjectsFromCloud();
       await loadPapersFromCloud();
       await loadResearchDataFromCloud();
-      await loadDocumentsFromCloud();    // for cloud storage 
+      await loadDocumentsFromCloud();// for cloud storage 
+      await loadTasksFromCloud();
       populateProjectDropdown();
 
       $('authSection').style.display = 'none';
