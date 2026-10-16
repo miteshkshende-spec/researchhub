@@ -611,11 +611,10 @@ progress: Math.min(100, Math.max(0, Number($('pProgress').value) || 0))
   }
 });
 
-
-  
-
 $('paperForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  let uploadedFilePath = '';
 
   try {
     const { data: { user }, error: userError } =
@@ -623,6 +622,33 @@ $('paperForm').addEventListener('submit', async (e) => {
 
     if (userError) throw userError;
     if (!user) throw new Error('Please log in first.');
+
+    const selectedFile = $('paperFile').files[0];
+
+    // Upload the actual PDF to private Supabase Storage.
+    if (selectedFile) {
+      if (!selectedFile.name.toLowerCase().endsWith('.pdf')) {
+        throw new Error('Please select a PDF file.');
+      }
+
+      const safeFileName = selectedFile.name.replace(
+        /[^a-zA-Z0-9._-]/g,
+        '_'
+      );
+
+      uploadedFilePath =
+        `${user.id}/${Date.now()}-${safeFileName}`;
+
+      const { error: uploadError } = await supabaseClient
+        .storage
+        .from('research-papers')
+        .upload(uploadedFilePath, selectedFile, {
+          contentType: 'application/pdf',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+    }
 
     const paperValues = {
       user_id: user.id,
@@ -635,7 +661,7 @@ $('paperForm').addEventListener('submit', async (e) => {
       summary: $('paperAbstract').value.trim(),
       methodology: $('paperMethod').value.trim(),
       findings: $('paperFindings').value.trim(),
-      pdf_link: $('paperFile').files[0]?.name || ''
+      pdf_link: uploadedFilePath
     };
 
     const { data, error } = await supabaseClient
@@ -663,12 +689,32 @@ $('paperForm').addEventListener('submit', async (e) => {
 
     save('papers');
     e.target.reset();
-    alert('Paper saved successfully!');
+
+    alert(
+      selectedFile
+        ? 'Paper and PDF saved successfully!'
+        : 'Paper saved successfully!'
+    );
+
   } catch (error) {
     console.error('Paper save failed:', error);
+
+    // Clean up the uploaded file if saving its paper record failed.
+    if (uploadedFilePath) {
+      const { error: cleanupError } = await supabaseClient
+        .storage
+        .from('research-papers')
+        .remove([uploadedFilePath]);
+
+      if (cleanupError) {
+        console.error('PDF cleanup failed:', cleanupError);
+      }
+    }
+
     alert('Could not save paper: ' + error.message);
   }
 });
+
 
 $('docForm').addEventListener('submit', async (e) => {
   e.preventDefault();
