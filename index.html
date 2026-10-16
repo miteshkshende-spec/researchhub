@@ -334,8 +334,44 @@ async function loadProjectsFromCloud() {
   }));
   save('projects');
 }
-function del(k,itemId){if(confirm('Delete this record?')){state[k]=state[k].filter(x=>x.id!==itemId);save(k)}}
-function card(title,details,meta,k,itemId,extra=''){return `<article class="record"><h3>${esc(title)}</h3>${details?`<p>${esc(details)}</p>`:''}${extra}<div class="meta"><span>${esc(meta||'')}</span> 
+async function del(k, itemId) {
+  if (!confirm('Delete this record?')) return;
+
+  try {
+    const cloudTables = {
+      projects: 'projects',
+      papers: 'papers',
+      documents: 'documents',
+      data: 'research_data',
+      tasks: 'Task'
+    };
+
+    const table = cloudTables[k];
+
+    if (table) {
+      const { data: { user }, error: userError } =
+        await supabaseClient.auth.getUser();
+
+      if (userError) throw userError;
+      if (!user) throw new Error('Please log in again.');
+
+      const { error } = await supabaseClient
+        .from(table)
+        .delete()
+        .eq('id', itemId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    }
+
+    state[k] = state[k].filter(x => String(x.id) !== String(itemId));
+    save(k);
+  } catch (error) {
+    console.error('Delete failed:', error);
+    alert('Could not delete record: ' + error.message);
+  }
+}
+   function card(title,details,meta,k,itemId,extra=''){return `<article class="record"><h3>${esc(title)}</h3>${details?`<p>${esc(details)}</p>`:''}${extra}<div class="meta"><span>${esc(meta||'')}</span> 
 <button class="btn soft small" data-edit="${k}:${itemId}">Edit</button>
 <button class="btn danger small" data-del="${k}:${itemId}">Delete</button></div></article>`} 
 function bindDeletes(){
