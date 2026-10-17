@@ -729,6 +729,13 @@ function addForm(formId,k,build){$(formId).addEventListener('submit',e=>{e.preve
 
 $('discoverForm').addEventListener('submit', async function(e) {
   e.preventDefault();
+  if (!$('discoverQuery').value.trim()) {
+  $('discoverResults').innerHTML =
+    '<div class="empty">Enter a research topic above to discover papers.</div>';
+  $('discoverMessage').textContent =
+    'Search scholarly publications from different research fields.';
+  return;
+}
 
   const query = $('discoverQuery').value.trim();
   const year = $('discoverYear').value.trim();
@@ -806,7 +813,14 @@ $('discoverForm').addEventListener('submit', async function(e) {
   }
 });
    
-   
+   $('discoverQuery').addEventListener('input', function() {
+  if (!this.value.trim()) {
+    $('discoverResults').innerHTML =
+      '<div class="empty">Enter a research topic above to discover papers.</div>';
+    $('discoverMessage').textContent =
+      'Search scholarly publications from different research fields.';
+  }
+});
  
 $('projectForm').addEventListener('submit', async (e) => {
   e.preventDefault();
