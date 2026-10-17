@@ -763,7 +763,90 @@ if (!updatedTask) {
   };
 });
   bindDeletes()}
-function renderAll(){populateProjectDropdown();renderProjects();renderPapers();renderDocs();renderData();renderTasks();$('sProjects').textContent=state.projects.length;$('sPapers').textContent=state.papers.length;$('sDocs').textContent=state.docs.length;$('sData').textContent=state.data.length;renderDashboardPanels();renderLiteratureReviews()}
+
+
+function populateCitationPapers() {
+  const select = $('citationPaper');
+  if (!select) return;
+
+  const previousValue = select.value;
+
+  select.innerHTML =
+    '<option value="">Select a paper</option>' +
+    state.papers.map(p =>
+      `<option value="${esc(p.id)}">${esc(p.title || 'Untitled paper')}</option>`
+    ).join('');
+
+  if (state.papers.some(p => String(p.id) === previousValue)) {
+    select.value = previousValue;
+  }
+}
+
+function generateCitation() {
+  const paperId = $('citationPaper').value;
+  const style = $('citationStyle').value;
+  const output = $('citationOutput');
+
+  const paper = state.papers.find(p => String(p.id) === paperId);
+
+  if (!paper) {
+    output.value = '';
+    return;
+  }
+
+  const authors = (paper.authors || 'Unknown author')
+    .split(/,\s*/)
+    .filter(Boolean);
+
+  const year = paper.year || 'n.d.';
+  const title = paper.title || 'Untitled paper';
+  const journal = paper.journal || '';
+  const doi = paper.doi || '';
+
+  let citation = '';
+
+  if (style === 'apa') {
+    citation = `${authors.join(', ')} (${year}). ${title}.`;
+    if (journal) citation += ` ${journal}.`;
+    if (doi) citation += ` ${doi}`;
+  } else if (style === 'mla') {
+    citation = `${authors.join(', ')}. "${title}."`;
+    if (journal) citation += ` ${journal},`;
+    citation += ` ${year}.`;
+    if (doi) citation += ` ${doi}`;
+  } else {
+    citation = `${authors.join(', ')}, "${title},"`;
+    if (journal) citation += ` ${journal},`;
+    citation += ` ${year}.`;
+    if (doi) citation += ` ${doi}`;
+  }
+
+  output.value = citation;
+}
+
+$('citationPaper').addEventListener('change', generateCitation);
+$('citationStyle').addEventListener('change', generateCitation);
+
+$('copyCitation').addEventListener('click', async () => {
+  const text = $('citationOutput').value;
+
+  if (!text) {
+    alert('Please select a saved paper first.');
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(text);
+    alert('Citation copied!');
+  } catch (error) {
+    $('citationOutput').focus();
+    $('citationOutput').select();
+    alert('Citation selected. Press Ctrl+C to copy it.');
+  }
+});
+
+   
+function renderAll(){populateProjectDropdown();populateCitationPapers();renderProjects();renderPapers();renderDocs();renderData();renderTasks();$('sProjects').textContent=state.projects.length;$('sPapers').textContent=state.papers.length;$('sDocs').textContent=state.docs.length;$('sData').textContent=state.data.length;renderDashboardPanels();renderLiteratureReviews()}
    
 function renderDashboardPanels() {
   const progressBox = $('dashboardProgress');
