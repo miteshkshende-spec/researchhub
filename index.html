@@ -798,8 +798,21 @@ $('discoverForm').addEventListener('submit', async function(e) {
           <span>DOI: ${esc(doi || 'Not listed')}</span>
         </div>
         ${link ? `<p style="margin-top:12px">
-          <a href="${esc(link)}" target="_blank" rel="noopener noreferrer">Open publication ↗</a>
-        </p>` : ''}
+  <a href="${esc(link)}" target="_blank" rel="noopener noreferrer">Open publication ↗</a>
+</p>` : ''}
+
+<button
+  class="btn small"
+  type="button"
+  data-save-discovered="${esc(doi)}"
+  data-paper-title="${esc(title)}"
+  data-paper-authors="${esc(authors)}"
+  data-paper-year="${esc(String(publicationYear))}"
+  data-paper-journal="${esc(journal)}"
+  data-paper-link="${esc(link)}"
+>
+  ＋ Save to Paper Library
+</button>
       </article>`;
     }).join('');
 
@@ -820,7 +833,111 @@ $('discoverForm').addEventListener('submit', async function(e) {
   $('discoverMessage').textContent =
     'Search scholarly publications from different research fields.';
 });
-$('projectForm').addEventListener('submit', async (e) => {
+
+document.addEventListener('click', async function(e) {
+  const button = e.target.closest('[data-save-discovered]');
+  if (!button) return;
+
+  if (button.disabled) return;
+
+  const doi = button.dataset.saveDiscovered;
+  const title = button.dataset.paperTitle;
+  const authors = button.dataset.paperAuthors;
+  const year = button.dataset.paperYear;
+  const journal = button.dataset.paperJournal;
+  const link = button.dataset.paperLink;
+
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Saving...';
+
+  try {
+    const { data: authData, error: authError } =
+      await supabaseClient.auth.getUser();
+
+    if (authError) throw authError;
+
+    const user = authData.user;
+    if (!user) throw new Error('Please log in first.');
+
+    // Check whether this paper is already in the library.
+    let duplicateCheck = supabaseClient
+      .from('papers')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('title', title);
+
+    if (doi) {
+      duplicateCheck = supabaseClient
+        .from('papers')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('doi_url', 'https://doi.org/' + doi);
+    }
+
+    const { data: existingPaper, error: duplicateError } =
+      await duplicateCheck.limit(1);
+
+    if (duplicateError) throw duplicateError;
+
+    if (existingPaper && existingPaper.length > 0) {
+      button.textContent = 'Already in Library ✓';
+      alert('This paper is already in your Paper Library.');
+      return;
+    }
+
+    const paperValues = {
+      user_id: user.id,
+      title: title,
+      authors: authors === 'Authors not listed' ? '' : authors,
+      year: year === 'Year unknown' ? '' : year,
+      journal: journal === 'Publication not listed' ? '' : journal,
+      doi_url: doi ? 'https://doi.org/' + doi : link,
+      keywords: '',
+      summary: '',
+      methodology: '',
+      findings: '',
+      pdf_link: ''
+    };
+
+    const { data: savedPaper, error: saveError } =
+      await supabaseClient
+        .from('papers')
+        .insert(paperValues)
+        .select()
+        .single();
+
+    if (saveError) throw saveError;
+
+    state.papers.unshift({
+      id: String(savedPaper.id),
+      title: savedPaper.title,
+      authors: savedPaper.authors || '',
+      year: savedPaper.year || '',
+      journal: savedPaper.journal || '',
+      doi: savedPaper.doi_url || '',
+      keywords: savedPaper.keywords || '',
+      abstract: savedPaper.summary || '',
+      method: savedPaper.methodology || '',
+      findings: savedPaper.findings || '',
+      file: savedPaper.pdf_link || '',
+      created: savedPaper.created_at || today()
+    });
+
+    renderAll();
+    button.textContent = 'Saved ✓';
+    alert('Paper saved to your Paper Library!');
+
+  } catch (saveError) {
+    console.error('Discovered paper save failed:', saveError);
+    alert('Could not save paper: ' + saveError.message);
+    button.textContent = originalText;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+   $('projectForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const form = e.currentTarget;
