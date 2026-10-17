@@ -813,15 +813,13 @@ $('discoverForm').addEventListener('submit', async function(e) {
   }
 });
    
-   $('discoverQuery').addEventListener('input', function() {
-  if (!this.value.trim()) {
-    $('discoverResults').innerHTML =
-      '<div class="empty">Enter a research topic above to discover papers.</div>';
-    $('discoverMessage').textContent =
-      'Search scholarly publications from different research fields.';
-  }
+ $('discoverQuery').addEventListener('input', function() {
+  $('discoverResults').innerHTML =
+    '<div class="empty">Enter a research topic above to discover papers.</div>';
+
+  $('discoverMessage').textContent =
+    'Search scholarly publications from different research fields.';
 });
- 
 $('projectForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
