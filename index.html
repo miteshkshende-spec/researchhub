@@ -647,7 +647,14 @@ $('paperForm').addEventListener('submit', async (e) => {
           upsert: false
         });
 
-      if (uploadError) throw uploadError;
+    
+if (uploadError) {
+  console.error('PDF UPLOAD FAILED:', uploadError);
+  alert('PDF upload failed: ' + uploadError.message);
+  throw uploadError;
+}
+alert('PDF uploaded to Storage successfully!');
+  
     }
 
     const paperValues = {
