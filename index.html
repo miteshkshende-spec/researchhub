@@ -1905,6 +1905,7 @@ async function loadTasksFromCloud() {
     if (data.session) {
       await loadProjectsFromCloud();
       await loadPapersFromCloud();
+      populateCitationPapers();
       await loadResearchDataFromCloud();
       await loadDocumentsFromCloud();// for cloud storage 
       await loadTasksFromCloud();
