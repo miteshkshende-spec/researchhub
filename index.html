@@ -11,37 +11,184 @@
 @media(max-width:560px){.hero{padding:21px}.hero .art{display:none}.grid3{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.stat{padding:13px}.stat strong{font-size:24px}.sectionhead{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
+ 
+/* ResearchHub modern login design */
+#authSection.auth-card,
+#resetPasswordSection.auth-card {
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  max-width: 430px;
+  margin: 48px auto;
+  padding: 36px;
+  background: #fff;
+  border: 1px solid #e2eaf4;
+  border-radius: 22px;
+  box-shadow: 0 18px 55px rgba(23, 63, 114, 0.12);
+}
+
+.auth-logo {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 22px;
+  border-radius: 16px;
+  background: #173f72;
+  color: white;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.auth-eyebrow {
+  color: #2764a5;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.auth-card h2 {
+  margin: 8px 0;
+  color: #173f72;
+  font-size: 27px;
+  line-height: 1.25;
+}
+
+.auth-subtitle {
+  margin: 0 0 26px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.auth-card label {
+  display: block;
+  margin: 15px 0 7px;
+  color: #26384d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.auth-card input {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 13px 14px;
+  margin: 0 0 14px;
+  border: 1px solid #d5dfeb;
+  border-radius: 10px;
+  background: #f8fafd;
+  font: inherit;
+  outline: none;
+}
+
+.auth-card input:focus {
+  border-color: #2764a5;
+  box-shadow: 0 0 0 3px rgba(39, 100, 165, 0.12);
+}
+
+.auth-primary,
+.auth-secondary,
+.auth-link {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 13px;
+  margin-top: 12px;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-primary {
+  border: 0;
+  background: #173f72;
+  color: white;
+}
+
+.auth-primary:hover {
+  background: #22558f;
+}
+
+.auth-secondary {
+  border: 1px solid #d5dfeb;
+  background: white;
+  color: #173f72;
+}
+
+.auth-link {
+  border: 0;
+  background: transparent;
+  color: #2764a5;
+}
+
+.auth-footer {
+  margin: 22px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  text-align: center;
+}
+
+#authMessage,
+#resetPasswordMessage {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  #authSection.auth-card,
+  #resetPasswordSection.auth-card {
+    margin: 20px auto;
+    padding: 26px 22px;
+  }
+
+  .auth-card h2 {
+    font-size: 24px;
+  }
+}
+ 
 <body>
 
-<div id="authSection" style="max-width:400px;margin:30px auto;padding:20px;border:1px solid #ddd;border-radius:12px">
-  <h2>ResearchHub Login</h2>
+
+<div id="authSection" class="auth-card">
+  <div class="auth-logo">R</div>
+  <p class="auth-eyebrow">YOUR RESEARCH WORKSPACE</p>
+  <h2>Welcome to ResearchHub</h2>
+  <p class="auth-subtitle">Your research journey, all in one place.</p>
+
   <form id="loginForm">
-    <label>Email</label>
-    <input id="authEmail" type="email" required
-      style="display:block;width:100%;padding:10px;margin:8px 0 16px">
-    <label>Password</label>
-    <input id="authPassword" type="password" required minlength="6"
-      style="display:block;width:100%;padding:10px;margin:8px 0 16px">
-    <button type="submit">Sign in</button>
-    <button type="button" id="signupButton">Create account</button>
-    <button type="button" id="forgotPasswordButton">Forgot password?</button>
+    <label for="authEmail">Email address</label>
+    <input id="authEmail" type="email" placeholder="you@example.com" required>
+
+    <label for="authPassword">Password</label>
+    <input id="authPassword" type="password" placeholder="Enter your password" required minlength="6">
+
+    <button type="submit" class="auth-primary">Sign in →</button>
+    <button type="button" id="signupButton" class="auth-secondary">Create a free account</button>
+    <button type="button" id="forgotPasswordButton" class="auth-link">Forgot password?</button>
   </form>
-  <p id="authMessage"></p>
+
+  <p id="authMessage" role="status"></p>
+  <p class="auth-footer">🔒 Your personal research workspace</p>
 </div>
-  
-<div id="resetPasswordSection" style="display:none;max-width:400px;margin:30px auto;padding:20px;border:1px solid #ddd;border-radius:12px">
-  <h2>Choose a New Password</h2>
+
+<div id="resetPasswordSection" class="auth-card" style="display:none">
+  <div class="auth-logo">R</div>
+  <h2>Choose a new password</h2>
+  <p class="auth-subtitle">Create a new password for your account.</p>
+
   <form id="resetPasswordForm">
-    <label>New password</label>
-    <input id="newPassword" type="password" required minlength="6"
-      style="display:block;width:100%;padding:10px;margin:8px 0 16px">
-    <label>Confirm new password</label>
-    <input id="confirmNewPassword" type="password" required minlength="6"
-      style="display:block;width:100%;padding:10px;margin:8px 0 16px">
-    <button type="submit">Update password</button>
+    <label for="newPassword">New password</label>
+    <input id="newPassword" type="password" placeholder="At least 6 characters" required minlength="6">
+
+    <label for="confirmNewPassword">Confirm new password</label>
+    <input id="confirmNewPassword" type="password" placeholder="Enter it again" required minlength="6">
+
+    <button type="submit" class="auth-primary">Update password →</button>
   </form>
-  <p id="resetPasswordMessage"></p>
+
+  <p id="resetPasswordMessage" role="status"></p>
 </div>
+
 
 <div class="layout" id="appDashboard" style="display:none;">
 <aside class="sidebar">
