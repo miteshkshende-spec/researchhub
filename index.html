@@ -51,6 +51,7 @@ id="overview"<!doctype html>
   <button data-view="projects">▣ &nbsp; Projects</button>
   <button data-view="papers">▤ &nbsp; Paper library</button>
    <button data-view="discover">🔎 &nbsp; Discover Papers</button>
+   <button data-view="literature">📊 &nbsp; Literature Review Matrix</button>
   <button data-view="documents">▧ &nbsp; Documents</button>
   <button data-view="data">▦ &nbsp; Research data</button>
   <button data-view="tasks">✓ &nbsp; Tasks & deadlines</button>
@@ -214,6 +215,58 @@ id="overview"<!doctype html>
 
   <div id="discoverResults" class="list" style="margin-top:15px">
     <div class="empty">Enter a research topic above to discover papers.</div>
+  </div>
+</section>
+
+<section class="view" id="literature">
+  <div class="sectionhead">
+    <h2>📊 Literature Review Matrix</h2>
+    <span class="muted">Compare research papers side by side</span>
+  </div>
+
+  <div class="panel">
+    <form id="literatureForm">
+      <div class="field">
+        <label for="litTitle">Paper title</label>
+        <input id="litTitle" required placeholder="Enter the paper title">
+      </div>
+
+      <div class="field">
+        <label for="litAuthors">Authors and year</label>
+        <input id="litAuthors" placeholder="e.g. Sharma et al., 2025">
+      </div>
+
+      <div class="field">
+        <label for="litObjective">Research objective</label>
+        <textarea id="litObjective" required placeholder="What was this paper trying to investigate?"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="litMethod">Methodology</label>
+        <textarea id="litMethod" required placeholder="What methods or techniques did the researchers use?"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="litFindings">Key findings</label>
+        <textarea id="litFindings" required placeholder="What were the main results?"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="litGap">Limitations or potential research gap</label>
+        <textarea id="litGap" placeholder="What limitations or unanswered questions did you identify?"></textarea>
+      </div>
+
+      <button class="btn" type="submit">＋ Add to Matrix</button>
+    </form>
+  </div>
+
+  <div class="sectionhead" style="margin-top:20px">
+    <h2>Your Literature Review</h2>
+    <span class="muted">Papers you have compared</span>
+  </div>
+
+  <div id="literatureResults" class="list">
+    <div class="empty">No papers added to your matrix yet.</div>
   </div>
 </section>
 
@@ -664,7 +717,7 @@ if (!updatedTask) {
   };
 });
   bindDeletes()}
-function renderAll(){populateProjectDropdown();renderProjects();renderPapers();renderDocs();renderData();renderTasks();$('sProjects').textContent=state.projects.length;$('sPapers').textContent=state.papers.length;$('sDocs').textContent=state.docs.length;$('sData').textContent=state.data.length;renderDashboardPanels()}
+function renderAll(){populateProjectDropdown();renderProjects();renderPapers();renderDocs();renderData();renderTasks();$('sProjects').textContent=state.projects.length;$('sPapers').textContent=state.papers.length;$('sDocs').textContent=state.docs.length;$('sData').textContent=state.data.length;renderDashboardPanels();renderLiteratureReviews()}
    
 function renderDashboardPanels() {
   const progressBox = $('dashboardProgress');
@@ -723,6 +776,69 @@ function renderDashboardPanels() {
     <p>🗂️ ${docs.length} document record${docs.length === 1 ? '' : 's'}</p>
     <p>📊 ${data.length} research data entr${data.length === 1 ? 'y' : 'ies'}</p>
     <p>✅ ${tasks.filter(t => t.done).length} of ${tasks.length} tasks completed</p>`;
+}
+   
+
+function renderLiteratureReviews() {
+  const box = $('literatureResults');
+  const reviews = state.literature || [];
+
+  if (!box) return;
+
+  if (!reviews.length) {
+    box.innerHTML =
+      '<div class="empty">No papers added to your matrix yet.</div>';
+    return;
+  }
+
+  box.innerHTML = reviews.map(review => `
+    <article class="record">
+      <h3>${esc(review.title)}</h3>
+      <p><strong>Authors:</strong> ${esc(review.authors || 'Not provided')}</p>
+      <p><strong>Objective:</strong> ${esc(review.objective || '')}</p>
+      <p><strong>Methodology:</strong> ${esc(review.methodology || '')}</p>
+      <p><strong>Key findings:</strong> ${esc(review.findings || '')}</p>
+      <p><strong>Limitations / potential research gap:</strong>
+        ${esc(review.research_gap || 'Not provided')}
+      </p>
+    </article>
+  `).join('');
+}
+
+async function loadLiteratureReviewsFromCloud() {
+  const { data: authData, error: authError } =
+    await supabaseClient.auth.getUser();
+
+  if (authError) throw authError;
+
+  const user = authData.user;
+
+  if (!user) {
+    state.literature = [];
+    renderLiteratureReviews();
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from('literature_reviews')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  state.literature = (data || []).map(row => ({
+    id: String(row.id),
+    title: row.title,
+    authors: row.authors || '',
+    objective: row.objective || '',
+    methodology: row.methodology || '',
+    findings: row.findings || '',
+    research_gap: row.research_gap || '',
+    created: row.created_at || today()
+  }));
+
+  renderLiteratureReviews();
 }
 
 function addForm(formId,k,build){$(formId).addEventListener('submit',e=>{e.preventDefault();state[k].unshift({id:id(),...build()});save(k);e.target.reset()})}
@@ -934,6 +1050,72 @@ document.addEventListener('click', async function(e) {
     button.textContent = originalText;
   } finally {
     button.disabled = false;
+  }
+});
+
+$('literatureForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const form = e.currentTarget;
+  const submitButton = form.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+
+  submitButton.disabled = true;
+  submitButton.textContent = 'Saving...';
+
+  try {
+    const { data: authData, error: authError } =
+      await supabaseClient.auth.getUser();
+
+    if (authError) throw authError;
+
+    const user = authData.user;
+    if (!user) throw new Error('Please log in first.');
+
+    const review = {
+      user_id: user.id,
+      title: $('litTitle').value.trim(),
+      authors: $('litAuthors').value.trim(),
+      objective: $('litObjective').value.trim(),
+      methodology: $('litMethod').value.trim(),
+      findings: $('litFindings').value.trim(),
+      research_gap: $('litGap').value.trim()
+    };
+
+    const { data, error } = await supabaseClient
+      .from('literature_reviews')
+      .insert(review)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    const savedReview = {
+      id: String(data.id),
+      title: data.title,
+      authors: data.authors || '',
+      objective: data.objective || '',
+      methodology: data.methodology || '',
+      findings: data.findings || '',
+      research_gap: data.research_gap || '',
+      created: data.created_at || today()
+    };
+
+    state.literature = state.literature || [];
+    state.literature.unshift(savedReview);
+
+    form.reset();
+
+    renderLiteratureReviews();
+
+    alert('Literature review saved successfully!');
+
+  } catch (error) {
+    console.error('Literature review save failed:', error);
+    alert('Could not save literature review: ' + error.message);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
   }
 });
 
@@ -1548,6 +1730,7 @@ async function loadTasksFromCloud() {
       await loadResearchDataFromCloud();
       await loadDocumentsFromCloud();// for cloud storage 
       await loadTasksFromCloud();
+            await loadLiteratureReviewsFromCloud();
       populateProjectDropdown();
 
       $('authSection').style.display = 'none';
