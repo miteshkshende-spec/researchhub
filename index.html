@@ -43,9 +43,6 @@ id="overview"<!doctype html>
   <p id="resetPasswordMessage"></p>
 </div>
 
-
- 
-
 <div class="layout" id="appDashboard" style="display:none;">
 <aside class="sidebar">
  <div class="brand"><span class="logo">R</span> ResearchHub</div>
@@ -53,6 +50,7 @@ id="overview"<!doctype html>
   <button class="active" data-view="home">⌂ &nbsp; Overview</button>
   <button data-view="projects">▣ &nbsp; Projects</button>
   <button data-view="papers">▤ &nbsp; Paper library</button>
+   <button data-view="discover">🔎 &nbsp; Discover Papers</button>
   <button data-view="documents">▧ &nbsp; Documents</button>
   <button data-view="data">▦ &nbsp; Research data</button>
   <button data-view="tasks">✓ &nbsp; Tasks & deadlines</button>
@@ -178,7 +176,48 @@ id="overview"<!doctype html>
  </div>
 </section>
 
-<section class="view" id="documents">
+<section class="view" id="discover">
+  <div class="sectionhead">
+    <h2>🔎 Discover Research Papers</h2>
+    <span class="muted">Search across academic fields</span>
+  </div>
+
+  <div class="panel">
+    <form id="discoverForm">
+      <div class="field">
+        <label for="discoverQuery">Research topic, paper title, author, or keyword</label>
+        <input
+          id="discoverQuery"
+          type="search"
+          placeholder="e.g. artificial intelligence in healthcare"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="discoverYear">Publication year (optional)</label>
+        <input
+          id="discoverYear"
+          type="number"
+          placeholder="e.g. 2025"
+          min="1800"
+          max="2100"
+        >
+      </div>
+
+      <button class="btn" type="submit">🔎 Search Papers</button>
+      <p id="discoverMessage" class="muted">
+        Search scholarly publications from different research fields.
+      </p>
+    </form>
+  </div>
+
+  <div id="discoverResults" class="list" style="margin-top:15px">
+    <div class="empty">Enter a research topic above to discover papers.</div>
+  </div>
+</section>
+
+  <section class="view" id="documents">
  <div class="sectionhead"><h2>Documents & paperwork</h2><button class="btn line small" id="exportDocs">Export register CSV</button></div>
  <div class="split">
   <div class="panel"><h3 style="margin-top:0">Register a document</h3><form id="docForm">
@@ -687,6 +726,86 @@ function renderDashboardPanels() {
 }
 
 function addForm(formId,k,build){$(formId).addEventListener('submit',e=>{e.preventDefault();state[k].unshift({id:id(),...build()});save(k);e.target.reset()})}
+
+$('discoverForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const query = $('discoverQuery').value.trim();
+  const year = $('discoverYear').value.trim();
+  const resultsBox = $('discoverResults');
+  const message = $('discoverMessage');
+
+  if (!query) return;
+
+  resultsBox.innerHTML = '<div class="empty">Searching scholarly publications...</div>';
+  message.textContent = 'Connecting to Crossref...';
+
+  try {
+    let url = 'https://api.crossref.org/works?query.bibliographic=' +
+      encodeURIComponent(query) + '&rows=10&sort=relevance&order=desc';
+
+    if (year) {
+      url += '&filter=from-pub-date:' + year + '-01-01,to-pub-date:' +
+        year + '-12-31';
+    }
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error('The scholarly search service returned an error.');
+    }
+
+    const result = await response.json();
+    const papers = result.message.items || [];
+
+    if (!papers.length) {
+      resultsBox.innerHTML = '<div class="empty">No papers found. Try different keywords.</div>';
+      message.textContent = 'Search complete.';
+      return;
+    }
+
+    resultsBox.innerHTML = papers.map(paper => {
+      const title = paper.title?.[0] || 'Untitled paper';
+      const authors = (paper.author || [])
+        .map(a => [a.given, a.family].filter(Boolean).join(' '))
+        .filter(Boolean)
+        .join(', ') || 'Authors not listed';
+
+      const journal = paper['container-title']?.[0] || 'Publication not listed';
+      const dateParts = paper['published-print']?.['date-parts']?.[0]
+        || paper['published-online']?.['date-parts']?.[0]
+        || paper.created?.['date-parts']?.[0];
+
+      const publicationYear = dateParts?.[0] || 'Year unknown';
+      const doi = paper.DOI || '';
+      const link = doi
+        ? 'https://doi.org/' + encodeURIComponent(doi)
+        : (paper.URL || '');
+
+      return `<article class="record">
+        <h3>${esc(title)}</h3>
+        <p><strong>Authors:</strong> ${esc(authors)}</p>
+        <p><strong>Journal:</strong> ${esc(journal)}</p>
+        <div class="meta">
+          <span>Published: ${esc(String(publicationYear))}</span>
+          <span>DOI: ${esc(doi || 'Not listed')}</span>
+        </div>
+        ${link ? `<p style="margin-top:12px">
+          <a href="${esc(link)}" target="_blank" rel="noopener noreferrer">Open publication ↗</a>
+        </p>` : ''}
+      </article>`;
+    }).join('');
+
+    message.textContent = 'Found ' + papers.length +
+      ' publications. Search results are provided by Crossref.';
+  } catch (error) {
+    console.error('Paper search failed:', error);
+    resultsBox.innerHTML =
+      '<div class="empty">Search failed. Check your internet connection and try again.</div>';
+    message.textContent = error.message;
+  }
+});
+   
    
  
 $('projectForm').addEventListener('submit', async (e) => {
