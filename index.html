@@ -1,4 +1,4 @@
-id="overview"<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -148,8 +148,25 @@ id="overview"<!doctype html>
   <div>
 <div class="field"><label>Search papers</label><input class="search" id="paperSearch" placeholder="Search title, author, keyword, method..."></div>
 <div class="field"><label>Filter by year</label><select id="paperYearFilter"><option value="">All years</option></select></div>
+
 <div class="field"><label>Filter by journal / source</label><select id="paperJournalFilter"><option value="">All sources</option></select></div>
-<div id="paperList" class="list"></div></div>
+
+<div class="field">
+  <label for="paperAuthorFilter">Filter by author</label>
+  <select id="paperAuthorFilter">
+    <option value="">All authors</option>
+  </select>
+</div>
+
+<div class="field">
+  <label for="paperKeywordFilter">Filter by keyword</label>
+  <select id="paperKeywordFilter">
+    <option value="">All keywords</option>
+  </select>
+</div>
+
+<div id="paperList" class="list"></div>
+
   
 <div class="panel" style="margin-top:16px">
   <h3 style="margin-top:0">Citation generator</h3>
@@ -553,6 +570,8 @@ function renderPapers(){
   const q = $('paperSearch').value.toLowerCase().trim();
   const year = $('paperYearFilter').value;
   const journal = $('paperJournalFilter').value;
+  const author = $('paperAuthorFilter').value;
+  const keyword = $('paperKeywordFilter').value;
 
   const years = [...new Set(state.papers.map(x => String(x.year || '')).filter(Boolean))]
     .sort((a,b) => Number(b) - Number(a));
@@ -560,8 +579,19 @@ function renderPapers(){
   const journals = [...new Set(state.papers.map(x => (x.journal || '').trim()).filter(Boolean))]
     .sort();
 
+  const authors = [...new Set(state.papers.map(x => (x.authors || '').trim()).filter(Boolean))]
+    .sort();
+
+  const keywords = [...new Set(
+    state.papers.flatMap(x =>
+      (x.keywords || '').split(',').map(k => k.trim()).filter(Boolean)
+    )
+  )].sort((a,b) => a.localeCompare(b));
+
   const yearFilter = $('paperYearFilter');
   const journalFilter = $('paperJournalFilter');
+  const authorFilter = $('paperAuthorFilter');
+  const keywordFilter = $('paperKeywordFilter');
 
   yearFilter.innerHTML = '<option value="">All years</option>' +
     years.map(y => `<option value="${esc(y)}">${esc(y)}</option>`).join('');
@@ -569,8 +599,16 @@ function renderPapers(){
   journalFilter.innerHTML = '<option value="">All sources</option>' +
     journals.map(j => `<option value="${esc(j)}">${esc(j)}</option>`).join('');
 
+  authorFilter.innerHTML = '<option value="">All authors</option>' +
+    authors.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('');
+
+  keywordFilter.innerHTML = '<option value="">All keywords</option>' +
+    keywords.map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join('');
+
   yearFilter.value = years.includes(year) ? year : '';
   journalFilter.value = journals.includes(journal) ? journal : '';
+  authorFilter.value = authors.includes(author) ? author : '';
+  keywordFilter.value = keywords.includes(keyword) ? keyword : '';
 
   const rows = state.papers.filter(x => {
     const text = [
@@ -578,10 +616,18 @@ function renderPapers(){
       x.method, x.findings, x.journal
     ].join(' ').toLowerCase();
 
+    const paperKeywords = (x.keywords || '')
+      .split(',')
+      .map(k => k.trim().toLowerCase());
+
     return text.includes(q) &&
       (!yearFilter.value || String(x.year || '') === yearFilter.value) &&
-      (!journalFilter.value || (x.journal || '').trim() === journalFilter.value);
+      (!journalFilter.value || (x.journal || '').trim() === journalFilter.value) &&
+      (!authorFilter.value || (x.authors || '').trim() === authorFilter.value) &&
+      (!keywordFilter.value || paperKeywords.includes(keywordFilter.value.toLowerCase()));
   });
+
+
 
   $('paperList').innerHTML = rows.length
     ? rows.map(x => {
@@ -1797,6 +1843,8 @@ restoreLoginSession();
   $('paperSearch').addEventListener('input', renderPapers);
 $('paperYearFilter').addEventListener('change', renderPapers);
 $('paperJournalFilter').addEventListener('change', renderPapers);
+  $('paperAuthorFilter').addEventListener('change', renderPapers);
+$('paperKeywordFilter').addEventListener('change', renderPapers);
     renderAll();
    
 </script>
