@@ -625,7 +625,67 @@ if (!updatedTask) {
   };
 });
   bindDeletes()}
-function renderAll(){populateProjectDropdown();renderProjects();renderPapers();renderDocs();renderData();renderTasks();$('sProjects').textContent=state.projects.length;$('sPapers').textContent=state.papers.length;$('sDocs').textContent=state.docs.length;$('sData').textContent=state.data.length}
+function renderAll(){populateProjectDropdown();renderProjects();renderPapers();renderDocs();renderData();renderTasks();$('sProjects').textContent=state.projects.length;$('sPapers').textContent=state.papers.length;$('sDocs').textContent=state.docs.length;$('sData').textContent=state.data.length;renderDashboardPanels()}
+   
+function renderDashboardPanels() {
+  const progressBox = $('dashboardProgress');
+  const deadlinesBox = $('dashboardDeadlines');
+  const activityBox = $('dashboardActivity');
+
+  if (!progressBox || !deadlinesBox || !activityBox) return;
+
+  const projects = state.projects || [];
+  const tasks = state.tasks || [];
+  const papers = state.papers || [];
+  const docs = state.docs || [];
+  const data = state.data || [];
+
+  // Project progress
+  progressBox.innerHTML = projects.length
+    ? projects.slice(0, 5).map(p => {
+        const progress = Math.min(100, Math.max(0, Number(p.progress) || 0));
+        return `<div style="margin:12px 0">
+          <div style="display:flex;justify-content:space-between;gap:8px;font-size:13px">
+            <strong>${esc(p.title)}</strong><span>${progress}%</span>
+          </div>
+          <progress value="${progress}" max="100" style="width:100%;margin-top:6px"></progress>
+        </div>`;
+      }).join('')
+    : '<p class="muted">Add a project to track its progress.</p>';
+
+  // Upcoming tasks
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+
+  const upcoming = tasks
+    .filter(t => !t.done && t.due)
+    .filter(t => {
+      const dueDate = new Date(t.due + 'T00:00:00');
+      return !Number.isNaN(dueDate.getTime());
+    })
+    .sort((a, b) => a.due.localeCompare(b.due))
+    .slice(0, 5);
+
+  deadlinesBox.innerHTML = upcoming.length
+    ? upcoming.map(t => {
+        const dueDate = new Date(t.due + 'T00:00:00');
+        const overdue = dueDate < todayDate;
+        return `<div style="margin:12px 0;font-size:13px">
+          <strong>${esc(t.title)}</strong>
+          <div class="muted">${overdue ? '⚠️ Overdue · ' : 'Due · '}${esc(t.due)}</div>
+        </div>`;
+      }).join('')
+    : '<p class="muted">No upcoming task deadlines. Add a task with a due date.</p>';
+
+  // Recent activity summary
+  activityBox.innerHTML = `
+    <p>🧪 ${projects.length} project${projects.length === 1 ? '' : 's'} tracked</p>
+    <p>📚 ${papers.length} paper${papers.length === 1 ? '' : 's'} collected</p>
+    <p>🗂️ ${docs.length} document record${docs.length === 1 ? '' : 's'}</p>
+    <p>📊 ${data.length} research data entr${data.length === 1 ? 'y' : 'ies'}</p>
+    <p>✅ ${tasks.filter(t => t.done).length} of ${tasks.length} tasks completed</p>`;
+}
+
 function addForm(formId,k,build){$(formId).addEventListener('submit',e=>{e.preventDefault();state[k].unshift({id:id(),...build()});save(k);e.target.reset()})}
    
  
