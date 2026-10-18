@@ -1,0 +1,12 @@
+
+{
+  "id": "/researchhub/",
+  "name": "ResearchHub",
+  "short_name": "ResearchHub",
+  "description": "A workspace for student research and methodology",
+  "start_url": "/researchhub/",
+  "scope": "/researchhub/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#173f72"
+}
