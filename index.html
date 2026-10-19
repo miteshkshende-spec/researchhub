@@ -2080,4 +2080,20 @@ $('paperKeywordFilter').addEventListener('change', renderPapers);
     renderAll();
    
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/researchhub/sw.js')
+      .then(registration => {
+        console.log(
+          'ResearchHub service worker registered:',
+          registration.scope
+        );
+      })
+      .catch(error => {
+        console.error('Service worker registration failed:', error);
+      });
+  });
+}
+</script> 
 </body></html>
